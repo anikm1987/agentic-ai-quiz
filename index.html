@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI Rapid Quiz — Guild Challenge</title>
+    <meta name="description" content="Interactive rapid-fire quiz on Agentic AI & Models. Test your knowledge on MCP, ReAct, Claude Code, multi-agent systems and more!">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body, #root { min-height: 100vh; background: #0a0e17; }
+        @keyframes particleFall { 0% { transform: translateY(-10px) rotate(0deg); opacity: 0; } 10% { opacity: 0.6; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 170, 0.3); } 50% { box-shadow: 0 0 40px rgba(0, 255, 170, 0.6); } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideIn { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes celebrate { 0% { transform: scale(1) rotate(0deg); } 25% { transform: scale(1.1) rotate(-3deg); } 50% { transform: scale(1.05) rotate(3deg); } 75% { transform: scale(1.1) rotate(-2deg); } 100% { transform: scale(1) rotate(0deg); } }
+        @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+        @keyframes fadeSlideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes crownBounce { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-8px) rotate(5deg); } }
+        @keyframes borderGlow { 0%, 100% { border-color: rgba(0,255,170,0.3); } 50% { border-color: rgba(0,255,170,0.8); } }
+        .buzzer-btn:active { transform: scale(0.92) !important; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef, useCallback } = React;
+
+        const QUESTIONS = [
+            {
+                id: 1, category: "FUNDAMENTALS",
+                question: "What is the core characteristic that distinguishes an 'Agentic AI' system from a standard LLM chatbot?",
+                options: ["Larger parameter count", "Ability to autonomously plan, decide & act", "Faster inference speed", "Better grammar correction"],
+                correct: 1, timeLimit: 15, points: 100,
+                explanation: "Agentic AI systems can autonomously plan, make decisions, use tools, and take actions to accomplish goals — going beyond simple prompt-response."
+            },
+            {
+                id: 2, category: "ARCHITECTURE",
+                question: "In the ReAct (Reasoning + Acting) framework, what cycle does an agent follow?",
+                options: ["Input → Output → Log", "Thought → Action → Observation", "Prompt → Response → Feedback", "Encode → Decode → Generate"],
+                correct: 1, timeLimit: 12, points: 150,
+                explanation: "ReAct interleaves reasoning (Thought) with tool use (Action) and processes results (Observation) in a loop until the task is solved."
+            },
+            {
+                id: 3, category: "TOOL USE",
+                question: "What protocol did Anthropic release to standardize how AI agents connect to external tools and data sources?",
+                options: ["GraphQL Agent API", "Model Context Protocol (MCP)", "OpenTool Standard", "Agent Bridge Protocol"],
+                correct: 1, timeLimit: 12, points: 150,
+                explanation: "MCP (Model Context Protocol) is Anthropic's open standard for connecting AI assistants to external tools, data sources, and services."
+            },
+            {
+                id: 4, category: "MODELS",
+                question: "Which model family introduced the concept of 'extended thinking' where the model reasons step-by-step before responding?",
+                options: ["GPT-4 Turbo", "Gemini Ultra", "Claude 3.7 Sonnet / Claude 4", "Mistral Large"],
+                correct: 2, timeLimit: 12, points: 200,
+                explanation: "Claude's extended thinking feature lets the model use a scratchpad to reason through complex problems step-by-step before giving a final answer."
+            },
+            {
+                id: 5, category: "PATTERNS",
+                question: "What is 'tool use' or 'function calling' in the context of agentic AI?",
+                options: ["Training the model on code", "The model invoking external APIs/functions to get data or perform actions", "Fine-tuning with reinforcement learning", "Compiling the model into an executable"],
+                correct: 1, timeLimit: 12, points: 100,
+                explanation: "Tool use allows an AI model to call external functions, APIs, or services to retrieve information or perform actions beyond its training data."
+            },
+            {
+                id: 6, category: "MULTI-AGENT",
+                question: "In a multi-agent system, what is the 'orchestrator' pattern?",
+                options: ["All agents vote on the answer", "A central agent delegates tasks to specialized sub-agents", "Agents compete and the fastest wins", "Agents share the same memory bank"],
+                correct: 1, timeLimit: 15, points: 200,
+                explanation: "The orchestrator pattern uses a central 'manager' agent that breaks down tasks and delegates sub-tasks to specialized agents, then synthesizes results."
+            },
+            {
+                id: 7, category: "SAFETY",
+                question: "What is 'prompt injection' in the context of agentic AI security?",
+                options: ["Adding more tokens to increase context", "Malicious input that tricks the agent into ignoring instructions", "A method to speed up inference", "Injecting training data at runtime"],
+                correct: 1, timeLimit: 12, points: 150,
+                explanation: "Prompt injection is an attack where adversarial text tricks an AI agent into overriding its original instructions, posing serious security risks for autonomous agents."
+            },
+            {
+                id: 8, category: "CODING AGENTS",
+                question: "What is Claude Code?",
+                options: ["A VS Code theme", "An agentic command-line coding tool by Anthropic", "A code compilation service", "A GitHub Copilot alternative plugin"],
+                correct: 1, timeLimit: 10, points: 150,
+                explanation: "Claude Code is Anthropic's agentic command-line tool that lets developers delegate coding tasks — editing files, running tests, git operations — directly from the terminal."
+            },
+            {
+                id: 9, category: "ADVANCED",
+                question: "What does 'grounding' mean in the context of agentic AI?",
+                options: ["Connecting the model to electrical ground", "Anchoring agent responses in real, verifiable data sources", "Reducing model parameters", "Training on synthetic data only"],
+                correct: 1, timeLimit: 12, points: 200,
+                explanation: "Grounding connects AI outputs to real data (web search, databases, documents) to reduce hallucinations and ensure factual accuracy."
+            },
+            {
+                id: 10, category: "FRONTIER",
+                question: "What is 'computer use' in the context of AI agents?",
+                options: ["Running AI on faster hardware", "An agent that can see and interact with a computer's screen, mouse & keyboard", "Using computers to train models", "Storing model weights on disk"],
+                correct: 1, timeLimit: 12, points: 250,
+                explanation: "Computer use allows AI agents to visually perceive screen content and control mouse/keyboard to interact with any software — a major step toward general-purpose agents."
+            }
+        ];
+
+        const PHASE = { SETUP: "setup", PLAYING: "playing", BUZZER: "buzzer", REVEAL: "reveal", LEADERBOARD: "leaderboard", FINAL: "final" };
+
+        const Particle = ({ delay, x }) => (
+            <div style={{
+                position: "absolute", left: `${x}%`, top: "-10px", width: "4px", height: "4px",
+                borderRadius: "50%", background: `hsl(${Math.random() * 60 + 160}, 100%, 70%)`,
+                animation: `particleFall 3s ${delay}s infinite linear`, opacity: 0.6
+            }} />
+        );
+
+        function AgenticQuiz() {
+            const [phase, setPhase] = useState(PHASE.SETUP);
+            const [players, setPlayers] = useState([]);
+            const [newPlayer, setNewPlayer] = useState("");
+            const [currentQ, setCurrentQ] = useState(0);
+            const [timer, setTimer] = useState(0);
+            const [buzzerPlayer, setBuzzerPlayer] = useState(null);
+            const [showAnswer, setShowAnswer] = useState(false);
+            const [selectedOption, setSelectedOption] = useState(null);
+            const [shakeWrong, setShakeWrong] = useState(false);
+            const [streaks, setStreaks] = useState({});
+            const [questionRevealed, setQuestionRevealed] = useState(false);
+            const timerRef = useRef(null);
+            const audioCtx = useRef(null);
+
+            const playSound = useCallback((freq, dur, type = "sine") => {
+                try {
+                    if (!audioCtx.current) audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
+                    const ctx = audioCtx.current;
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+                    osc.connect(gain).connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + dur);
+                } catch (e) {}
+            }, []);
+
+            const playBuzzer = () => { playSound(880, 0.1); setTimeout(() => playSound(1100, 0.15), 100); };
+            const playCorrect = () => { playSound(523, 0.1); setTimeout(() => playSound(659, 0.1), 100); setTimeout(() => playSound(784, 0.2), 200); };
+            const playWrong = () => { playSound(200, 0.3, "sawtooth"); };
+            const playTick = () => { playSound(1000, 0.03); };
+
+            useEffect(() => {
+                if (phase === PHASE.PLAYING && timer > 0) {
+                    timerRef.current = setTimeout(() => {
+                        setTimer(t => t - 1);
+                        if (timer <= 5) playTick();
+                    }, 1000);
+                    return () => clearTimeout(timerRef.current);
+                }
+                if (phase === PHASE.PLAYING && timer === 0) {
+                    setShowAnswer(true);
+                    playWrong();
+                }
+            }, [timer, phase]);
+
+            const addPlayer = () => {
+                if (newPlayer.trim() && players.length < 10) {
+                    setPlayers(p => [...p, { name: newPlayer.trim(), score: 0, correct: 0, buzzFirst: 0 }]);
+                    setNewPlayer("");
+                }
+            };
+
+            const startQuiz = () => {
+                if (players.length < 1) return;
+                setCurrentQ(0);
+                setPhase(PHASE.PLAYING);
+                setTimer(QUESTIONS[0].timeLimit);
+                setShowAnswer(false);
+                setSelectedOption(null);
+                setQuestionRevealed(true);
+            };
+
+            const handleBuzz = (playerIdx) => {
+                if (buzzerPlayer !== null || showAnswer) return;
+                playBuzzer();
+                setBuzzerPlayer(playerIdx);
+                setPhase(PHASE.BUZZER);
+                clearTimeout(timerRef.current);
+            };
+
+            const handleAnswer = (correct) => {
+                const q = QUESTIONS[currentQ];
+                if (correct) {
+                    playCorrect();
+                    const timeBonus = Math.floor(timer * 10);
+                    const streakKey = buzzerPlayer;
+                    const currentStreak = (streaks[streakKey] || 0) + 1;
+                    const streakBonus = currentStreak >= 3 ? 50 : 0;
+                    setStreaks(s => ({ ...s, [streakKey]: currentStreak }));
+                    setPlayers(p => p.map((pl, i) => i === buzzerPlayer
+                        ? { ...pl, score: pl.score + q.points + timeBonus + streakBonus, correct: pl.correct + 1, buzzFirst: pl.buzzFirst + 1 }
+                        : pl
+                    ));
+                } else {
+                    playWrong();
+                    setShakeWrong(true);
+                    setStreaks(s => ({ ...s, [buzzerPlayer]: 0 }));
+                    setTimeout(() => setShakeWrong(false), 500);
+                }
+                setShowAnswer(true);
+                setPhase(PHASE.REVEAL);
+            };
+
+            const nextQuestion = () => {
+                if (currentQ + 1 >= QUESTIONS.length) {
+                    setPhase(PHASE.FINAL);
+                    return;
+                }
+                const next = currentQ + 1;
+                setCurrentQ(next);
+                setTimer(QUESTIONS[next].timeLimit);
+                setShowAnswer(false);
+                setBuzzerPlayer(null);
+                setSelectedOption(null);
+                setPhase(PHASE.PLAYING);
+                setQuestionRevealed(true);
+            };
+
+            const showLeaderboard = () => setPhase(PHASE.LEADERBOARD);
+            const backToGame = () => setPhase(showAnswer ? PHASE.REVEAL : PHASE.PLAYING);
+
+            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            const q = QUESTIONS[currentQ];
+            const progress = ((currentQ + 1) / QUESTIONS.length) * 100;
+
+            return (
+                <div style={{
+                    minHeight: "100vh", background: "#0a0e17",
+                    fontFamily: "'Segoe UI', system-ui, sans-serif", color: "#e0e6f0", overflow: "hidden", position: "relative"
+                }}>
+                    {Array.from({ length: 15 }).map((_, i) => (
+                        <Particle key={i} delay={i * 0.4} x={Math.random() * 100} />
+                    ))}
+
+                    {/* SETUP PHASE */}
+                    {phase === PHASE.SETUP && (
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", padding: "20px", position: "relative", zIndex: 1 }}>
+                            <div style={{
+                                position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                                background: "radial-gradient(ellipse at 30% 20%, rgba(0,255,170,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(100,80,255,0.06) 0%, transparent 50%)",
+                                pointerEvents: "none"
+                            }} />
+                            <div style={{ textAlign: "center", marginBottom: "40px", animation: "slideUp 0.6s ease-out", position: "relative" }}>
+                                <div style={{ fontSize: "12px", letterSpacing: "6px", color: "#00ffaa", fontFamily: "Orbitron", marginBottom: "12px", textTransform: "uppercase" }}>⚡ Guild Challenge</div>
+                                <h1 style={{
+                                    fontFamily: "Orbitron", fontSize: "clamp(28px, 5vw, 52px)", fontWeight: 900,
+                                    background: "linear-gradient(135deg, #00ffaa, #00ccff, #8b5cf6)",
+                                    backgroundSize: "200% 200%", animation: "gradientShift 4s ease infinite",
+                                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", lineHeight: 1.1
+                                }}>AGENTIC AI</h1>
+                                <h2 style={{ fontFamily: "Orbitron", fontSize: "clamp(16px, 3vw, 24px)", color: "#667", fontWeight: 400, marginTop: "4px", letterSpacing: "3px" }}>RAPID QUIZ</h2>
+                                <div style={{ width: "60px", height: "3px", background: "linear-gradient(90deg, #00ffaa, #00ccff)", margin: "16px auto", borderRadius: "2px" }} />
+                                <p style={{ fontFamily: "Exo 2", color: "#889", fontSize: "14px" }}>{QUESTIONS.length} Questions · Speed Matters · First Buzz Wins</p>
+                            </div>
+
+                            <div style={{
+                                background: "rgba(15,20,35,0.8)", border: "1px solid rgba(0,255,170,0.15)", borderRadius: "16px",
+                                padding: "28px", width: "100%", maxWidth: "480px", backdropFilter: "blur(20px)", animation: "slideUp 0.8s ease-out"
+                            }}>
+                                <div style={{ fontFamily: "Orbitron", fontSize: "11px", letterSpacing: "3px", color: "#00ffaa", marginBottom: "16px" }}>ADD PLAYERS</div>
+                                <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
+                                    <input
+                                        value={newPlayer}
+                                        onChange={e => setNewPlayer(e.target.value)}
+                                        onKeyDown={e => e.key === "Enter" && addPlayer()}
+                                        placeholder="Enter player name..."
+                                        style={{
+                                            flex: 1, padding: "12px 16px", background: "rgba(0,255,170,0.05)", border: "1px solid rgba(0,255,170,0.2)",
+                                            borderRadius: "10px", color: "#e0e6f0", fontSize: "15px", fontFamily: "Exo 2", outline: "none"
+                                        }}
+                                    />
+                                    <button onClick={addPlayer} style={{
+                                        padding: "12px 20px", background: "linear-gradient(135deg, #00ffaa, #00cc88)", border: "none",
+                                        borderRadius: "10px", color: "#0a0e17", fontFamily: "Orbitron", fontWeight: 700, fontSize: "13px", cursor: "pointer"
+                                    }}>+</button>
+                                </div>
+
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "20px", minHeight: "40px" }}>
+                                    {players.map((p, i) => (
+                                        <div key={i} style={{
+                                            display: "flex", alignItems: "center", gap: "8px", padding: "8px 14px",
+                                            background: `rgba(${[0, 255, 170][i % 3] || 100}, ${[255, 170, 100][i % 3] || 200}, ${[170, 0, 255][i % 3] || 150}, 0.1)`,
+                                            border: `1px solid rgba(${[0, 255, 170][i % 3] || 100}, ${[255, 170, 100][i % 3] || 200}, ${[170, 0, 255][i % 3] || 150}, 0.3)`,
+                                            borderRadius: "20px", animation: `fadeSlideUp 0.3s ${i * 0.1}s both`
+                                        }}>
+                                            <div style={{
+                                                width: "24px", height: "24px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+                                                background: `hsl(${i * 45 + 160}, 80%, 50%)`, fontSize: "11px", fontWeight: 700, color: "#0a0e17"
+                                            }}>{p.name[0].toUpperCase()}</div>
+                                            <span style={{ fontFamily: "Exo 2", fontSize: "13px", fontWeight: 600, color: "#e0e6f0" }}>{p.name}</span>
+                                            <span onClick={() => setPlayers(pl => pl.filter((_, j) => j !== i))} style={{ cursor: "pointer", opacity: 0.5, fontSize: "16px", marginLeft: "4px", color: "#e0e6f0" }}>×</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <button onClick={startQuiz} disabled={players.length < 1} style={{
+                                    width: "100%", padding: "16px", background: players.length >= 1 ? "linear-gradient(135deg, #00ffaa, #00ccff)" : "rgba(255,255,255,0.1)",
+                                    border: "none", borderRadius: "12px", color: "#0a0e17", fontFamily: "Orbitron", fontWeight: 900,
+                                    fontSize: "16px", cursor: players.length >= 1 ? "pointer" : "default", letterSpacing: "2px",
+                                    animation: players.length >= 1 ? "glow 2s infinite" : "none", transition: "all 0.3s"
+                                }}>
+                                    {players.length < 1 ? "ADD PLAYERS TO START" : "START QUIZ →"}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* GAME PHASES */}
+                    {(phase === PHASE.PLAYING || phase === PHASE.BUZZER || phase === PHASE.REVEAL) && (
+                        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }}>
+                            <div style={{
+                                display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px",
+                                background: "rgba(10,14,23,0.95)", borderBottom: "1px solid rgba(0,255,170,0.1)"
+                            }}>
+                                <div style={{ fontFamily: "Orbitron", fontSize: "11px", color: "#00ffaa", letterSpacing: "2px" }}>
+                                    Q{currentQ + 1}/{QUESTIONS.length}
+                                </div>
+                                <div style={{ flex: 1, margin: "0 16px", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px", overflow: "hidden" }}>
+                                    <div style={{ width: `${progress}%`, height: "100%", background: "linear-gradient(90deg, #00ffaa, #00ccff)", borderRadius: "2px", transition: "width 0.5s" }} />
+                                </div>
+                                <button onClick={showLeaderboard} style={{
+                                    padding: "6px 14px", background: "rgba(0,255,170,0.1)", border: "1px solid rgba(0,255,170,0.3)",
+                                    borderRadius: "8px", color: "#00ffaa", fontFamily: "Orbitron", fontSize: "10px", cursor: "pointer", letterSpacing: "1px"
+                                }}>🏆 SCORES</button>
+                            </div>
+
+                            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "20px", maxWidth: "800px", margin: "0 auto", width: "100%" }}>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "16px" }}>
+                                    <div style={{
+                                        padding: "6px 16px", background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)",
+                                        borderRadius: "20px", fontFamily: "Orbitron", fontSize: "10px", letterSpacing: "2px", color: "#a78bfa"
+                                    }}>{q.category}</div>
+                                    <div style={{
+                                        display: "flex", alignItems: "center", gap: "8px",
+                                        animation: timer <= 5 && !showAnswer ? "timerPulse 0.5s infinite" : "none"
+                                    }}>
+                                        <div style={{
+                                            fontFamily: "Orbitron", fontSize: "28px", fontWeight: 900,
+                                            color: timer <= 5 ? "#ff4444" : timer <= 10 ? "#ffaa00" : "#00ffaa",
+                                            textShadow: timer <= 5 ? "0 0 20px rgba(255,68,68,0.5)" : "none",
+                                            transition: "color 0.3s"
+                                        }}>{timer}s</div>
+                                    </div>
+                                    <div style={{
+                                        padding: "6px 14px", background: "rgba(0,255,170,0.1)", border: "1px solid rgba(0,255,170,0.2)",
+                                        borderRadius: "20px", fontFamily: "Orbitron", fontSize: "10px", color: "#00ffaa"
+                                    }}>🎯 {q.points} PTS</div>
+                                </div>
+
+                                <div style={{
+                                    background: "rgba(15,20,35,0.9)", border: "1px solid rgba(0,255,170,0.15)", borderRadius: "20px",
+                                    padding: "28px", width: "100%", marginBottom: "20px", backdropFilter: "blur(20px)",
+                                    animation: questionRevealed ? "slideUp 0.5s ease-out" : "none",
+                                    ...(shakeWrong ? { animation: "shake 0.5s" } : {})
+                                }}>
+                                    <h2 style={{
+                                        fontFamily: "Exo 2", fontSize: "clamp(17px, 2.5vw, 22px)", fontWeight: 600, lineHeight: 1.5,
+                                        color: "#f0f4ff", textAlign: "center"
+                                    }}>{q.question}</h2>
+                                </div>
+
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", width: "100%", marginBottom: "16px" }}>
+                                    {q.options.map((opt, i) => {
+                                        const isCorrect = i === q.correct;
+                                        const isSelected = selectedOption === i;
+                                        let bg = "rgba(20,28,50,0.8)";
+                                        let borderColor = "rgba(100,120,180,0.2)";
+                                        if (showAnswer && isCorrect) { bg = "rgba(0,255,170,0.15)"; borderColor = "#00ffaa"; }
+                                        else if (showAnswer && isSelected && !isCorrect) { bg = "rgba(255,68,68,0.15)"; borderColor = "#ff4444"; }
+                                        const labels = ["A", "B", "C", "D"];
+                                        return (
+                                            <button key={i} onClick={() => { if (!showAnswer && phase === PHASE.BUZZER) { setSelectedOption(i); handleAnswer(isCorrect); } }}
+                                                style={{
+                                                    display: "flex", alignItems: "center", gap: "12px", padding: "14px 16px",
+                                                    background: bg, border: `1px solid ${borderColor}`, borderRadius: "14px",
+                                                    color: showAnswer && isCorrect ? "#00ffaa" : "#c0c8e0", fontFamily: "Exo 2", fontSize: "14px",
+                                                    fontWeight: 500, cursor: phase === PHASE.BUZZER && !showAnswer ? "pointer" : "default",
+                                                    transition: "all 0.3s", textAlign: "left",
+                                                    animation: showAnswer && isCorrect ? "glow 1.5s infinite" : `fadeSlideUp 0.3s ${i * 0.08}s both`
+                                                }}>
+                                                <span style={{
+                                                    minWidth: "30px", height: "30px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center",
+                                                    background: showAnswer && isCorrect ? "rgba(0,255,170,0.2)" : "rgba(100,120,180,0.15)",
+                                                    fontFamily: "Orbitron", fontSize: "12px", fontWeight: 700
+                                                }}>{labels[i]}</span>
+                                                {opt}
+                                                {showAnswer && isCorrect && <span style={{ marginLeft: "auto", fontSize: "18px" }}>✓</span>}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                {showAnswer && (
+                                    <div style={{
+                                        background: "rgba(0,255,170,0.05)", border: "1px solid rgba(0,255,170,0.15)", borderRadius: "14px",
+                                        padding: "16px 20px", width: "100%", marginBottom: "16px", animation: "fadeSlideUp 0.4s ease-out"
+                                    }}>
+                                        <div style={{ fontFamily: "Orbitron", fontSize: "9px", letterSpacing: "2px", color: "#00ffaa", marginBottom: "8px" }}>💡 EXPLANATION</div>
+                                        <p style={{ fontFamily: "Exo 2", fontSize: "13px", color: "#99aabb", lineHeight: 1.6 }}>{q.explanation}</p>
+                                    </div>
+                                )}
+
+                                {phase === PHASE.BUZZER && !showAnswer && (
+                                    <div style={{
+                                        background: "rgba(255,200,0,0.08)", border: "1px solid rgba(255,200,0,0.2)", borderRadius: "14px",
+                                        padding: "16px", width: "100%", textAlign: "center", animation: "fadeSlideUp 0.3s"
+                                    }}>
+                                        <div style={{ fontFamily: "Orbitron", fontSize: "14px", color: "#ffcc00", marginBottom: "8px" }}>
+                                            🔔 {players[buzzerPlayer]?.name} BUZZED IN!
+                                        </div>
+                                        <p style={{ fontFamily: "Exo 2", fontSize: "12px", color: "#889" }}>Host: Click the correct answer, or mark wrong below</p>
+                                        <button onClick={() => handleAnswer(false)} style={{
+                                            marginTop: "8px", padding: "8px 20px", background: "rgba(255,68,68,0.15)", border: "1px solid rgba(255,68,68,0.3)",
+                                            borderRadius: "8px", color: "#ff6666", fontFamily: "Orbitron", fontSize: "11px", cursor: "pointer"
+                                        }}>✗ WRONG ANSWER</button>
+                                    </div>
+                                )}
+
+                                {phase === PHASE.PLAYING && !showAnswer && (
+                                    <div style={{ width: "100%" }}>
+                                        <div style={{ fontFamily: "Orbitron", fontSize: "10px", letterSpacing: "2px", color: "#556", textAlign: "center", marginBottom: "10px" }}>
+                                            🔴 BUZZ IN!
+                                        </div>
+                                        <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(players.length, 5)}, 1fr)`, gap: "8px" }}>
+                                            {players.map((p, i) => (
+                                                <button key={i} className="buzzer-btn" onClick={() => handleBuzz(i)} style={{
+                                                    padding: "14px 8px", background: `linear-gradient(135deg, hsl(${i * 45 + 160}, 70%, 25%), hsl(${i * 45 + 180}, 70%, 15%))`,
+                                                    border: `2px solid hsl(${i * 45 + 160}, 80%, 50%)`, borderRadius: "14px",
+                                                    color: `hsl(${i * 45 + 160}, 80%, 75%)`, fontFamily: "Orbitron", fontSize: "11px", fontWeight: 700,
+                                                    cursor: "pointer", transition: "transform 0.1s", animation: "borderGlow 2s infinite",
+                                                    textAlign: "center", letterSpacing: "1px"
+                                                }}>
+                                                    <div style={{ fontSize: "22px", marginBottom: "4px" }}>🔴</div>
+                                                    {p.name}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {showAnswer && (
+                                    <button onClick={nextQuestion} style={{
+                                        padding: "14px 40px", background: "linear-gradient(135deg, #00ffaa, #00ccff)", border: "none",
+                                        borderRadius: "12px", color: "#0a0e17", fontFamily: "Orbitron", fontWeight: 900, fontSize: "14px",
+                                        cursor: "pointer", letterSpacing: "2px", marginTop: "8px", animation: "pulse 2s infinite"
+                                    }}>
+                                        {currentQ + 1 >= QUESTIONS.length ? "🏆 FINAL RESULTS" : "NEXT →"}
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* LEADERBOARD */}
+                    {phase === PHASE.LEADERBOARD && (
+                        <div style={{
+                            minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center",
+                            justifyContent: "center", padding: "20px", position: "relative", zIndex: 2
+                        }}>
+                            <div style={{ textAlign: "center", marginBottom: "30px" }}>
+                                <div style={{ fontFamily: "Orbitron", fontSize: "10px", letterSpacing: "4px", color: "#00ffaa", marginBottom: "8px" }}>LIVE</div>
+                                <h2 style={{ fontFamily: "Orbitron", fontSize: "28px", fontWeight: 900, color: "#f0f4ff" }}>🏆 LEADERBOARD</h2>
+                            </div>
+                            <div style={{ width: "100%", maxWidth: "500px" }}>
+                                {sortedPlayers.map((p, i) => (
+                                    <div key={p.name} style={{
+                                        display: "flex", alignItems: "center", gap: "14px", padding: "14px 18px", marginBottom: "8px",
+                                        background: i === 0 ? "rgba(255,215,0,0.1)" : "rgba(15,20,35,0.8)",
+                                        border: `1px solid ${i === 0 ? "rgba(255,215,0,0.3)" : "rgba(100,120,180,0.1)"}`,
+                                        borderRadius: "14px", animation: `slideIn 0.4s ${i * 0.1}s both`
+                                    }}>
+                                        <div style={{
+                                            fontFamily: "Orbitron", fontSize: "18px", fontWeight: 900, minWidth: "36px",
+                                            color: i === 0 ? "#ffd700" : i === 1 ? "#c0c0c0" : i === 2 ? "#cd7f32" : "#556"
+                                        }}>{i === 0 ? "👑" : `#${i + 1}`}</div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontFamily: "Exo 2", fontWeight: 700, fontSize: "16px", color: "#e0e6f0" }}>{p.name}</div>
+                                            <div style={{ fontFamily: "Exo 2", fontSize: "11px", color: "#667" }}>
+                                                {p.correct} correct · {p.buzzFirst} first buzz{p.buzzFirst !== 1 ? "es" : ""}
+                                            </div>
+                                        </div>
+                                        <div style={{
+                                            fontFamily: "Orbitron", fontSize: "20px", fontWeight: 900,
+                                            color: i === 0 ? "#ffd700" : "#00ffaa"
+                                        }}>{p.score}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button onClick={backToGame} style={{
+                                marginTop: "24px", padding: "12px 32px", background: "rgba(0,255,170,0.1)",
+                                border: "1px solid rgba(0,255,170,0.3)", borderRadius: "10px", color: "#00ffaa",
+                                fontFamily: "Orbitron", fontSize: "12px", cursor: "pointer", letterSpacing: "2px"
+                            }}>← BACK TO QUIZ</button>
+                        </div>
+                    )}
+
+                    {/* FINAL RESULTS */}
+                    {phase === PHASE.FINAL && (
+                        <div style={{
+                            minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center",
+                            justifyContent: "center", padding: "20px", position: "relative", zIndex: 2
+                        }}>
+                            <div style={{
+                                position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+                                background: "radial-gradient(ellipse at 50% 30%, rgba(255,215,0,0.08) 0%, transparent 60%)",
+                                pointerEvents: "none"
+                            }} />
+                            <div style={{ animation: "celebrate 1s ease-in-out", textAlign: "center", marginBottom: "32px" }}>
+                                <div style={{ fontSize: "60px", marginBottom: "8px", animation: "crownBounce 1.5s infinite" }}>👑</div>
+                                <div style={{ fontFamily: "Orbitron", fontSize: "10px", letterSpacing: "4px", color: "#ffd700", marginBottom: "8px" }}>CHAMPION</div>
+                                <h1 style={{
+                                    fontFamily: "Orbitron", fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 900,
+                                    background: "linear-gradient(135deg, #ffd700, #ffaa00, #ff8800)",
+                                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
+                                }}>{sortedPlayers[0]?.name}</h1>
+                                <div style={{ fontFamily: "Orbitron", fontSize: "32px", color: "#ffd700", marginTop: "8px" }}>
+                                    {sortedPlayers[0]?.score} PTS
+                                </div>
+                            </div>
+                            <div style={{ width: "100%", maxWidth: "550px" }}>
+                                <div style={{ fontFamily: "Orbitron", fontSize: "10px", letterSpacing: "3px", color: "#556", textAlign: "center", marginBottom: "16px" }}>FINAL STANDINGS</div>
+                                {sortedPlayers.map((p, i) => (
+                                    <div key={p.name} style={{
+                                        display: "flex", alignItems: "center", gap: "14px", padding: "16px 20px", marginBottom: "8px",
+                                        background: i === 0 ? "linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,170,0,0.08))" : "rgba(15,20,35,0.8)",
+                                        border: `1px solid ${i === 0 ? "rgba(255,215,0,0.4)" : i === 1 ? "rgba(192,192,192,0.2)" : i === 2 ? "rgba(205,127,50,0.2)" : "rgba(100,120,180,0.1)"}`,
+                                        borderRadius: "16px", animation: `slideIn 0.5s ${i * 0.15}s both`
+                                    }}>
+                                        <div style={{
+                                            width: "40px", height: "40px", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center",
+                                            background: i === 0 ? "rgba(255,215,0,0.2)" : i === 1 ? "rgba(192,192,192,0.15)" : i === 2 ? "rgba(205,127,50,0.15)" : "rgba(50,60,90,0.5)",
+                                            fontFamily: "Orbitron", fontSize: i < 3 ? "20px" : "14px", fontWeight: 900,
+                                            color: i === 0 ? "#ffd700" : i === 1 ? "#c0c0c0" : i === 2 ? "#cd7f32" : "#556"
+                                        }}>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}</div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontFamily: "Exo 2", fontWeight: 700, fontSize: "17px", color: i === 0 ? "#ffd700" : "#e0e6f0" }}>{p.name}</div>
+                                            <div style={{ fontFamily: "Exo 2", fontSize: "12px", color: "#778", marginTop: "2px" }}>
+                                                {p.correct}/{QUESTIONS.length} correct · {p.buzzFirst} first buzz · {Math.round((p.correct / QUESTIONS.length) * 100)}% accuracy
+                                            </div>
+                                        </div>
+                                        <div style={{
+                                            fontFamily: "Orbitron", fontSize: "22px", fontWeight: 900,
+                                            color: i === 0 ? "#ffd700" : i === 1 ? "#c0c0c0" : "#00ffaa"
+                                        }}>{p.score}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <button onClick={() => { setPhase(PHASE.SETUP); setPlayers(p => p.map(pl => ({ ...pl, score: 0, correct: 0, buzzFirst: 0 }))); setCurrentQ(0); setStreaks({}); }}
+                                style={{
+                                    marginTop: "32px", padding: "14px 36px", background: "linear-gradient(135deg, #00ffaa, #00ccff)",
+                                    border: "none", borderRadius: "12px", color: "#0a0e17", fontFamily: "Orbitron", fontWeight: 900,
+                                    fontSize: "14px", cursor: "pointer", letterSpacing: "2px"
+                                }}>
+                                🔄 PLAY AGAIN
+                            </button>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById("root")).render(<AgenticQuiz />);
+    </script>
+</body>
+</html>
