@@ -1,578 +1,614 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agentic AI Rapid Quiz — Challenge</title>
-    <meta name="description" content="Interactive rapid-fire quiz on Agentic AI & Models. Test your knowledge on MCP, ReAct, Claude Code, multi-agent systems and more!">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body, #root { min-height: 100vh; background: #0a0e17; }
-        @keyframes particleFall { 0% { transform: translateY(-10px) rotate(0deg); opacity: 0; } 10% { opacity: 0.6; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-        @keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 170, 0.3); } 50% { box-shadow: 0 0 40px rgba(0, 255, 170, 0.6); } }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes slideIn { from { transform: translateX(-30px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-        @keyframes celebrate { 0% { transform: scale(1) rotate(0deg); } 25% { transform: scale(1.1) rotate(-3deg); } 50% { transform: scale(1.05) rotate(3deg); } 75% { transform: scale(1.1) rotate(-2deg); } 100% { transform: scale(1) rotate(0deg); } }
-        @keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-        @keyframes fadeSlideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
-        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @keyframes crownBounce { 0%, 100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-8px) rotate(5deg); } }
-        @keyframes borderGlow { 0%, 100% { border-color: rgba(0,255,170,0.3); } 50% { border-color: rgba(0,255,170,0.8); } }
-        .buzzer-btn:active { transform: scale(0.92) !important; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic AI Rapid Quiz — Challenge</title>
+<meta name="description" content="30-question rapid-fire quiz on Agentic AI & Models with increasing difficulty.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;background:#0a0e17;font-family:'Exo 2','Segoe UI',system-ui,sans-serif;color:#e0e6f0;overflow-x:hidden}
+.orb{font-family:'Orbitron',monospace}
+button{font-family:inherit;cursor:pointer}
+input,textarea{font-family:inherit}
+
+/* Particles */
+.particle{position:fixed;width:4px;height:4px;border-radius:50%;opacity:0.5;pointer-events:none;animation:pfall 4s linear infinite}
+@keyframes pfall{0%{transform:translateY(-10px) rotate(0);opacity:0}10%{opacity:0.5}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* Animations */
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{transform:translateX(-30px);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(0,255,170,0.3)}50%{box-shadow:0 0 40px rgba(0,255,170,0.6)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+@keyframes timerPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+@keyframes borderGlow{0%,100%{border-color:rgba(0,255,170,0.3)}50%{border-color:rgba(0,255,170,0.8)}}
+@keyframes crownBounce{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-8px) rotate(5deg)}}
+@keyframes celebrate{0%{transform:scale(1) rotate(0)}25%{transform:scale(1.1) rotate(-3deg)}50%{transform:scale(1.05) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes diffFlash{0%{opacity:0;transform:scale(0.5)}50%{opacity:1;transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+
+.buzzer-btn:active{transform:scale(0.92)!important}
+.buzzer-btn:hover{filter:brightness(1.2)}
+
+/* Screen centering helper */
+.screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1}
+.ambient{position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(0,255,170,0.08) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(100,80,255,0.06) 0%,transparent 50%);pointer-events:none;z-index:0}
+.card{background:rgba(15,20,35,0.8);border:1px solid rgba(0,255,170,0.15);border-radius:16px;padding:28px;width:100%;max-width:520px;backdrop-filter:blur(20px)}
+
+
+
+/* Player chips */
+.chip{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:20px;animation:fadeSlideUp 0.3s both}
+.chip-avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#0a0e17}
+.chip-x{cursor:pointer;opacity:0.4;font-size:15px;margin-left:2px}
+.chip-x:hover{opacity:1}
+
+/* Difficulty badges */
+.diff-badge{display:inline-block;padding:5px 14px;border-radius:20px;font-size:9px;letter-spacing:2px}
+.diff-EASY{background:rgba(0,255,170,0.12);border:1px solid rgba(0,255,170,0.3);color:#00ffaa}
+.diff-MEDIUM{background:rgba(255,170,0,0.12);border:1px solid rgba(255,170,0,0.3);color:#ffaa00}
+.diff-HARD{background:rgba(255,68,102,0.12);border:1px solid rgba(255,68,102,0.3);color:#ff4466}
+
+/* Options grid */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:14px}
+.opt-btn{display:flex;align-items:center;gap:12px;padding:13px 15px;background:rgba(20,28,50,0.8);border:1px solid rgba(100,120,180,0.2);border-radius:14px;color:#c0c8e0;font-size:14px;font-weight:500;text-align:left;transition:all 0.3s}
+.opt-btn.correct{background:rgba(0,255,170,0.15);border-color:#00ffaa;color:#00ffaa;animation:glow 1.5s infinite}
+.opt-btn.wrong{background:rgba(255,68,68,0.15);border-color:#ff4444}
+.opt-btn.clickable{cursor:pointer}
+.opt-btn.clickable:hover{filter:brightness(1.15);transform:translateY(-2px)}
+.opt-label{min-width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(100,120,180,0.15);font-size:11px;font-weight:700}
+.opt-btn.correct .opt-label{background:rgba(0,255,170,0.2)}
+
+/* Leaderboard rows */
+.lb-row{display:flex;align-items:center;gap:14px;padding:12px 16px;margin-bottom:8px;border-radius:14px;border:1px solid rgba(100,120,180,0.1);background:rgba(15,20,35,0.8)}
+.lb-row.first{background:rgba(255,215,0,0.1);border-color:rgba(255,215,0,0.3)}
+.lb-row.gold{background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,170,0,0.08));border-color:rgba(255,215,0,0.4)}
+
+/* Responsive buzzer grid */
+.buzzer-grid{display:grid;gap:8px}
+
+/* Hide scrollbar for leaderboard */
+.scroll-area{max-height:60vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,255,170,0.2) transparent}
+</style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useCallback } = React;
 
-        const QUESTIONS = [
-            {
-                id: 1, category: "FUNDAMENTALS",
-                question: "What is the core characteristic that distinguishes an 'Agentic AI' system from a standard LLM chatbot?",
-                options: ["Larger parameter count", "Ability to autonomously plan, decide & act", "Faster inference speed", "Better grammar correction"],
-                correct: 1, timeLimit: 15, points: 100,
-                explanation: "Agentic AI systems can autonomously plan, make decisions, use tools, and take actions to accomplish goals — going beyond simple prompt-response."
-            },
-            {
-                id: 2, category: "ARCHITECTURE",
-                question: "In the ReAct (Reasoning + Acting) framework, what cycle does an agent follow?",
-                options: ["Input → Output → Log", "Thought → Action → Observation", "Prompt → Response → Feedback", "Encode → Decode → Generate"],
-                correct: 1, timeLimit: 12, points: 150,
-                explanation: "ReAct interleaves reasoning (Thought) with tool use (Action) and processes results (Observation) in a loop until the task is solved."
-            },
-            {
-                id: 3, category: "TOOL USE",
-                question: "What protocol did Anthropic release to standardize how AI agents connect to external tools and data sources?",
-                options: ["GraphQL Agent API", "Model Context Protocol (MCP)", "OpenTool Standard", "Agent Bridge Protocol"],
-                correct: 1, timeLimit: 12, points: 150,
-                explanation: "MCP (Model Context Protocol) is Anthropic's open standard for connecting AI assistants to external tools, data sources, and services."
-            },
-            {
-                id: 4, category: "MODELS",
-                question: "Which model family introduced the concept of 'extended thinking' where the model reasons step-by-step before responding?",
-                options: ["GPT-4 Turbo", "Gemini Ultra", "Claude 3.7 Sonnet / Claude 4", "Mistral Large"],
-                correct: 2, timeLimit: 12, points: 200,
-                explanation: "Claude's extended thinking feature lets the model use a scratchpad to reason through complex problems step-by-step before giving a final answer."
-            },
-            {
-                id: 5, category: "PATTERNS",
-                question: "What is 'tool use' or 'function calling' in the context of agentic AI?",
-                options: ["Training the model on code", "The model invoking external APIs/functions to get data or perform actions", "Fine-tuning with reinforcement learning", "Compiling the model into an executable"],
-                correct: 1, timeLimit: 12, points: 100,
-                explanation: "Tool use allows an AI model to call external functions, APIs, or services to retrieve information or perform actions beyond its training data."
-            },
-            {
-                id: 6, category: "MULTI-AGENT",
-                question: "In a multi-agent system, what is the 'orchestrator' pattern?",
-                options: ["All agents vote on the answer", "A central agent delegates tasks to specialized sub-agents", "Agents compete and the fastest wins", "Agents share the same memory bank"],
-                correct: 1, timeLimit: 15, points: 200,
-                explanation: "The orchestrator pattern uses a central 'manager' agent that breaks down tasks and delegates sub-tasks to specialized agents, then synthesizes results."
-            },
-            {
-                id: 7, category: "SAFETY",
-                question: "What is 'prompt injection' in the context of agentic AI security?",
-                options: ["Adding more tokens to increase context", "Malicious input that tricks the agent into ignoring instructions", "A method to speed up inference", "Injecting training data at runtime"],
-                correct: 1, timeLimit: 12, points: 150,
-                explanation: "Prompt injection is an attack where adversarial text tricks an AI agent into overriding its original instructions, posing serious security risks for autonomous agents."
-            },
-            {
-                id: 8, category: "CODING AGENTS",
-                question: "What is Claude Code?",
-                options: ["A VS Code theme", "An agentic command-line coding tool by Anthropic", "A code compilation service", "A GitHub Copilot alternative plugin"],
-                correct: 1, timeLimit: 10, points: 150,
-                explanation: "Claude Code is Anthropic's agentic command-line tool that lets developers delegate coding tasks — editing files, running tests, git operations — directly from the terminal."
-            },
-            {
-                id: 9, category: "ADVANCED",
-                question: "What does 'grounding' mean in the context of agentic AI?",
-                options: ["Connecting the model to electrical ground", "Anchoring agent responses in real, verifiable data sources", "Reducing model parameters", "Training on synthetic data only"],
-                correct: 1, timeLimit: 12, points: 200,
-                explanation: "Grounding connects AI outputs to real data (web search, databases, documents) to reduce hallucinations and ensure factual accuracy."
-            },
-            {
-                id: 10, category: "FRONTIER",
-                question: "What is 'computer use' in the context of AI agents?",
-                options: ["Running AI on faster hardware", "An agent that can see and interact with a computer's screen, mouse & keyboard", "Using computers to train models", "Storing model weights on disk"],
-                correct: 1, timeLimit: 12, points: 250,
-                explanation: "Computer use allows AI agents to visually perceive screen content and control mouse/keyboard to interact with any software — a major step toward general-purpose agents."
-            }
-        ];
+<div class="ambient"></div>
+<div id="particles"></div>
+<div id="app"></div>
 
-        const PHASE = { SETUP: "setup", PLAYING: "playing", BUZZER: "buzzer", REVEAL: "reveal", LEADERBOARD: "leaderboard", FINAL: "final" };
+<script>
+"use strict";
 
-        const Particle = ({ delay, x }) => (
-            <div style={{
-                position: "absolute", left: `${x}%`, top: "-10px", width: "4px", height: "4px",
-                borderRadius: "50%", background: `hsl(${Math.random() * 60 + 160}, 100%, 70%)`,
-                animation: `particleFall 3s ${delay}s infinite linear`, opacity: 0.6
-            }} />
-        );
+// ══════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════
+var QUESTIONS = [
+  // EASY — Q1-10 (100 pts, 15s)
+  {id:1,cat:"BASICS",diff:"EASY",q:"What does 'LLM' stand for?",opts:["Linear Learning Machine","Logical Language Module","Large Language Model","Low Latency Memory"],ans:2,time:15,pts:100,exp:"LLM stands for Large Language Model — AI models trained on massive text data to understand and generate human language."},
+  {id:2,cat:"BASICS",diff:"EASY",q:"What is a 'prompt' in the context of AI?",opts:["A training algorithm","The input text you give to an AI model","A hardware accelerator","A type of neural network"],ans:1,time:15,pts:100,exp:"A prompt is the text instruction or question you provide to an AI model to get a response."},
+  {id:3,cat:"BASICS",diff:"EASY",q:"Which company created Claude?",opts:["OpenAI","Anthropic","Google DeepMind","Meta AI"],ans:1,time:15,pts:100,exp:"Claude is created by Anthropic, an AI safety company founded in 2021."},
+  {id:4,cat:"BASICS",diff:"EASY",q:"What does 'AI hallucination' refer to?",opts:["AI seeing images","AI crashing unexpectedly","AI running slowly","AI generating confident but incorrect information"],ans:3,time:15,pts:100,exp:"AI hallucination is when a model generates plausible-sounding but factually incorrect or fabricated information."},
+  {id:5,cat:"BASICS",diff:"EASY",q:"What is the 'context window' of an LLM?",opts:["The training dataset size","The number of GPUs used","The maximum amount of text it can process at once","The physical screen size"],ans:2,time:15,pts:100,exp:"The context window is the maximum number of tokens a model can read and generate in a single conversation."},
+  {id:6,cat:"BASICS",diff:"EASY",q:"What is 'fine-tuning' in AI?",opts:["Further training a pre-trained model on specific data","Removing bugs from code","Making the model smaller","Adjusting screen resolution"],ans:0,time:15,pts:100,exp:"Fine-tuning is training a pre-trained model further on a smaller, specialized dataset for a specific task."},
+  {id:7,cat:"BASICS",diff:"EASY",q:"What does 'token' mean in the context of LLMs?",opts:["A piece of text the model processes as one unit","A type of neural network layer","An API key","A digital coin"],ans:0,time:15,pts:100,exp:"A token is a chunk of text — roughly 3/4 of a word — that LLMs use as their basic unit of reading and writing."},
+  {id:8,cat:"FUNDAMENTALS",diff:"EASY",q:"What is the primary difference between an AI 'agent' and a simple chatbot?",opts:["Agents don't use language models","Agents can take actions and use tools autonomously","Agents are always faster","Agents have a face"],ans:1,time:15,pts:100,exp:"Unlike simple chatbots, AI agents can autonomously plan, use tools, and take actions to accomplish goals."},
+  {id:9,cat:"FUNDAMENTALS",diff:"EASY",q:"What is 'RAG' in the AI world?",opts:["Random Access Generation","Retrieval-Augmented Generation","Recurrent Attention Graph","Rapid Agent Gateway"],ans:1,time:15,pts:100,exp:"RAG combines a language model with a retrieval system to ground responses in real, fetched documents."},
+  {id:10,cat:"FUNDAMENTALS",diff:"EASY",q:"What does 'API' stand for?",opts:["Agent Protocol Integration","Automated Prompt Injection","Application Programming Interface","Artificial Processing Intelligence"],ans:2,time:15,pts:100,exp:"API stands for Application Programming Interface — the way software systems communicate with each other."},
 
-        function AgenticQuiz() {
-            const [phase, setPhase] = useState(PHASE.SETUP);
-            const [players, setPlayers] = useState([]);
-            const [newPlayer, setNewPlayer] = useState("");
-            const [currentQ, setCurrentQ] = useState(0);
-            const [timer, setTimer] = useState(0);
-            const [buzzerPlayer, setBuzzerPlayer] = useState(null);
-            const [showAnswer, setShowAnswer] = useState(false);
-            const [selectedOption, setSelectedOption] = useState(null);
-            const [shakeWrong, setShakeWrong] = useState(false);
-            const [streaks, setStreaks] = useState({});
-            const [questionRevealed, setQuestionRevealed] = useState(false);
-            const timerRef = useRef(null);
-            const audioCtx = useRef(null);
+  // MEDIUM — Q11-20 (200 pts, 12s)
+  {id:11,cat:"AGENTIC PATTERNS",diff:"MEDIUM",q:"In the ReAct framework, what cycle does an AI agent follow?",opts:["Prompt → Response → Feedback","Thought → Action → Observation","Input → Output → Log","Encode → Decode → Generate"],ans:1,time:12,pts:200,exp:"ReAct interleaves reasoning (Thought) with tool use (Action) and processes results (Observation) in a loop."},
+  {id:12,cat:"TOOL USE",diff:"MEDIUM",q:"What is 'function calling' or 'tool use' in agentic AI?",opts:["Running unit tests","Training the model to write code","Compiling neural networks","The model invoking external APIs/functions to retrieve data or perform actions"],ans:3,time:12,pts:200,exp:"Tool use allows an AI model to call external functions or APIs to retrieve information or perform actions."},
+  {id:13,cat:"PROTOCOLS",diff:"MEDIUM",q:"What protocol did Anthropic release to standardize how AI agents connect to external tools?",opts:["GraphQL Agent API","OpenTool Standard","Agent Bridge Protocol","Model Context Protocol (MCP)"],ans:3,time:12,pts:200,exp:"MCP is Anthropic's open standard for connecting AI assistants to external tools, data sources, and services."},
+  {id:14,cat:"CODING AGENTS",diff:"MEDIUM",q:"What is Claude Code?",opts:["A VS Code theme","A code compilation service","An agentic command-line coding tool by Anthropic","A GitHub Copilot plugin"],ans:2,time:12,pts:200,exp:"Claude Code is Anthropic's agentic CLI tool that lets developers delegate coding tasks from the terminal."},
+  {id:15,cat:"SAFETY",diff:"MEDIUM",q:"What is 'prompt injection'?",opts:["A method to speed up inference","Adding tokens to increase context","Malicious input that tricks an agent into ignoring its instructions","A way to add training data at runtime"],ans:2,time:12,pts:200,exp:"Prompt injection is an attack where adversarial text tricks an AI agent into overriding its original instructions."},
+  {id:16,cat:"GROUNDING",diff:"MEDIUM",q:"What does 'grounding' mean for AI agents?",opts:["Reducing model size","Connecting to electrical ground","Training only on synthetic data","Anchoring responses in real, verifiable data sources"],ans:3,time:12,pts:200,exp:"Grounding connects AI outputs to real data (search, databases, documents) to reduce hallucinations."},
+  {id:17,cat:"MODELS",diff:"MEDIUM",q:"What is 'extended thinking' in Claude models?",opts:["The model using a scratchpad to reason step-by-step before answering","Increasing the token limit","Running multiple models in parallel","Longer response times due to lag"],ans:0,time:12,pts:200,exp:"Extended thinking lets Claude reason through complex problems in a step-by-step scratchpad before answering."},
+  {id:18,cat:"ARCHITECTURE",diff:"MEDIUM",q:"What is 'computer use' in the context of AI agents?",opts:["Storing weights on disk","An agent that can see and interact with a screen, mouse & keyboard","Running AI on better hardware","Using computers to train models"],ans:1,time:12,pts:200,exp:"Computer use allows AI agents to visually perceive screen content and control mouse/keyboard to interact with any software."},
+  {id:19,cat:"AGENTIC PATTERNS",diff:"MEDIUM",q:"What is an 'agentic loop'?",opts:["A type of training loss function","An infinite recursion bug","A cycle where the agent plans, acts, observes, and repeats until done","A circular neural network"],ans:2,time:12,pts:200,exp:"An agentic loop is the iterative cycle where an agent plans, acts, observes, and adjusts until achieving its goal."},
+  {id:20,cat:"MEMORY",diff:"MEDIUM",q:"Why is 'memory' important for AI agents?",opts:["To retain context across tasks and sessions for better decisions","To store passwords","To compress the model","To increase GPU speed"],ans:0,time:12,pts:200,exp:"Memory allows agents to retain context and past interactions across sessions for more coherent long-term behavior."},
 
-            const playSound = useCallback((freq, dur, type = "sine") => {
-                try {
-                    if (!audioCtx.current) audioCtx.current = new (window.AudioContext || window.webkitAudioContext)();
-                    const ctx = audioCtx.current;
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.type = type;
-                    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-                    osc.connect(gain).connect(ctx.destination);
-                    osc.start();
-                    osc.stop(ctx.currentTime + dur);
-                } catch (e) {}
-            }, []);
+  // HARD — Q21-30 (300 pts, 10s)
+  {id:21,cat:"MULTI-AGENT",diff:"HARD",q:"In a multi-agent system, what is the 'orchestrator-worker' pattern?",opts:["All agents vote on answers","Agents clone themselves for parallel work","A central agent delegates sub-tasks to specialized agents and synthesizes results","Agents compete and the fastest wins"],ans:2,time:10,pts:300,exp:"The orchestrator-worker pattern uses a central 'manager' agent to break down tasks, delegate to specialists, and combine results."},
+  {id:22,cat:"ARCHITECTURE",diff:"HARD",q:"What is the 'evaluator-optimizer' pattern in agentic AI?",opts:["A training algorithm for fine-tuning","A method to compress models","A hardware benchmark","One agent generates output while another critiques and improves it iteratively"],ans:3,time:10,pts:300,exp:"In this pattern, one agent produces work while a separate evaluator reviews, critiques, and sends it back for improvement."},
+  {id:23,cat:"SAFETY",diff:"HARD",q:"What is 'indirect prompt injection' and why is it dangerous for agents?",opts:["Malicious instructions hidden in external data that agents fetch and process","Using deprecated model versions","Injecting prompts via CLI","Sending too many API requests"],ans:0,time:10,pts:300,exp:"Indirect prompt injection hides malicious instructions in external content that an agent retrieves, potentially hijacking its behavior."},
+  {id:24,cat:"PROTOCOLS",diff:"HARD",q:"In MCP, what are the three core primitives that servers can expose?",opts:["Input, Output, Error","Read, Write, Execute","Query, Mutate, Subscribe","Resources, Tools, and Prompts"],ans:3,time:10,pts:300,exp:"MCP servers expose Resources (data/context), Tools (executable functions), and Prompts (reusable templates) as their three core primitives."},
+  {id:25,cat:"ADVANCED",diff:"HARD",q:"What is 'chain-of-thought prompting' and how does it help agents?",opts:["Asking the model to reason step-by-step, improving accuracy on complex tasks","Using blockchain for AI verification","Chaining multiple models together","A technique to reduce token usage"],ans:0,time:10,pts:300,exp:"Chain-of-thought prompting instructs the model to reason step-by-step, dramatically improving complex reasoning performance."},
+  {id:26,cat:"FRONTIER",diff:"HARD",q:"What is 'tool poisoning' in agentic AI security?",opts:["Overloading an API with requests","A malicious tool that provides harmful or manipulated responses to an agent","Using too many tools at once","Training a model on corrupted data"],ans:1,time:10,pts:300,exp:"Tool poisoning occurs when a compromised tool feeds false or manipulated data back to an agent, causing bad decisions."},
+  {id:27,cat:"MULTI-AGENT",diff:"HARD",q:"What is the key challenge of 'shared state' in multi-agent systems?",opts:["Choosing a programming language","Agents running on different GPUs","Making agents look the same","Ensuring consistency when multiple agents read/write to the same data simultaneously"],ans:3,time:10,pts:300,exp:"Shared state requires careful coordination so multiple agents don't create conflicts or race conditions when accessing the same data."},
+  {id:28,cat:"ADVANCED",diff:"HARD",q:"What is 'scaffolding' in the context of building AI agents?",opts:["The surrounding code, logic & infrastructure that orchestrates an LLM into an agent","A testing methodology","A CSS framework for AI UIs","Physical hardware racks"],ans:0,time:10,pts:300,exp:"Scaffolding is the orchestration layer — code, prompts, tool definitions, memory, and control flow — that turns a base LLM into a functioning agent."},
+  {id:29,cat:"FRONTIER",diff:"HARD",q:"What is the 'alignment tax' debate in agentic AI?",opts:["The trade-off between making agents safe/aligned vs. maximally capable","Government tax on AI companies","A fee for using open-source models","The cost of GPU compute"],ans:0,time:10,pts:300,exp:"The 'alignment tax' refers to the potential performance cost of safety measures — whether making agents safer necessarily makes them less capable."},
+  {id:30,cat:"FRONTIER",diff:"HARD",q:"What is 'recursive self-improvement' and why is it a key AI safety concern?",opts:["A technique for faster training","An agent that improves its UI","An agent that can modify its own capabilities autonomously, risking uncontrolled escalation","A way to reduce API costs"],ans:2,time:10,pts:300,exp:"Recursive self-improvement is when an agent autonomously enhances its own capabilities, raising concerns about uncontrollable capability escalation."}
+];
 
-            const playBuzzer = () => { playSound(880, 0.1); setTimeout(() => playSound(1100, 0.15), 100); };
-            const playCorrect = () => { playSound(523, 0.1); setTimeout(() => playSound(659, 0.1), 100); setTimeout(() => playSound(784, 0.2), 200); };
-            const playWrong = () => { playSound(200, 0.3, "sawtooth"); };
-            const playTick = () => { playSound(1000, 0.03); };
+var DIFF = {
+  EASY:  {color:"#00ffaa",bg:"rgba(0,255,170,0.12)",border:"rgba(0,255,170,0.3)",icon:"\u{1F7E2}",label:"EASY",desc:"Questions 1\u201310 \xb7 100 pts \xb7 15 seconds"},
+  MEDIUM:{color:"#ffaa00",bg:"rgba(255,170,0,0.12)",border:"rgba(255,170,0,0.3)",icon:"\u{1F7E1}",label:"MEDIUM",desc:"Questions 11\u201320 \xb7 200 pts \xb7 12 seconds"},
+  HARD:  {color:"#ff4466",bg:"rgba(255,68,102,0.12)",border:"rgba(255,68,102,0.3)",icon:"\u{1F534}",label:"HARD",desc:"Questions 21\u201330 \xb7 300 pts \xb7 10 seconds"}
+};
 
-            useEffect(() => {
-                if (phase === PHASE.PLAYING && timer > 0) {
-                    timerRef.current = setTimeout(() => {
-                        setTimer(t => t - 1);
-                        if (timer <= 5) playTick();
-                    }, 1000);
-                    return () => clearTimeout(timerRef.current);
-                }
-                if (phase === PHASE.PLAYING && timer === 0) {
-                    setShowAnswer(true);
-                    playWrong();
-                }
-            }, [timer, phase]);
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+var state = {
+  phase: "setup", // setup | diff_intro | playing | buzzer | reveal | leaderboard | final
+  players: [],
+  currentQ: 0,
+  timer: 0,
+  buzzerPlayer: null,
+  showAnswer: false,
+  selectedOpt: null,
+  streaks: {},
+  diffIntroShown: {},
+  lastResult: null
+};
+var timerInterval = null;
+var audioCtx = null;
 
-            const addPlayer = () => {
-                if (newPlayer.trim() && players.length < 10) {
-                    setPlayers(p => [...p, { name: newPlayer.trim(), score: 0, correct: 0, buzzFirst: 0 }]);
-                    setNewPlayer("");
-                }
-            };
+// ══════════════════════════════════════════
+//  AUDIO
+// ══════════════════════════════════════════
+function snd(freq, dur, type) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    var o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type || "sine";
+    o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.13, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+function sndBuzz()   { snd(880,0.1); setTimeout(function(){snd(1100,0.15)},100); }
+function sndCorrect(){ snd(523,0.1); setTimeout(function(){snd(659,0.1)},100); setTimeout(function(){snd(784,0.2)},200); }
+function sndWrong()  { snd(200,0.3,"sawtooth"); }
+function sndTick()   { snd(1000,0.03); }
+function sndLevelUp(){ snd(440,0.1); setTimeout(function(){snd(554,0.1)},120); setTimeout(function(){snd(659,0.1)},240); setTimeout(function(){snd(880,0.25)},360); }
 
-            const startQuiz = () => {
-                if (players.length < 1) return;
-                setCurrentQ(0);
-                setPhase(PHASE.PLAYING);
-                setTimer(QUESTIONS[0].timeLimit);
-                setShowAnswer(false);
-                setSelectedOption(null);
-                setQuestionRevealed(true);
-            };
+// ══════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════
+var $ = function(id){ return document.getElementById(id); };
+function h(tag, attrs, children) {
+  var el = document.createElement(tag);
+  if (attrs) Object.keys(attrs).forEach(function(k){
+    if (k === "style" && typeof attrs[k] === "object") {
+      Object.assign(el.style, attrs[k]);
+    } else if (k === "className") {
+      el.className = attrs[k];
+    } else if (k.startsWith("on")) {
+      el.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
+    } else if (k === "html") {
+      el.innerHTML = attrs[k];
+    } else {
+      el.setAttribute(k, attrs[k]);
+    }
+  });
+  if (children !== undefined && children !== null) {
+    if (Array.isArray(children)) children.forEach(function(c){ if(c) el.appendChild(typeof c==="string"?document.createTextNode(c):c); });
+    else if (typeof children === "string") el.textContent = children;
+    else el.appendChild(children);
+  }
+  return el;
+}
 
-            const handleBuzz = (playerIdx) => {
-                if (buzzerPlayer !== null || showAnswer) return;
-                playBuzzer();
-                setBuzzerPlayer(playerIdx);
-                setPhase(PHASE.BUZZER);
-                clearTimeout(timerRef.current);
-            };
+function sorted() {
+  return state.players.slice().sort(function(a,b){ return b.score - a.score; });
+}
 
-            const handleAnswer = (correct) => {
-                const q = QUESTIONS[currentQ];
-                if (correct) {
-                    playCorrect();
-                    const timeBonus = Math.floor(timer * 10);
-                    const streakKey = buzzerPlayer;
-                    const currentStreak = (streaks[streakKey] || 0) + 1;
-                    const streakBonus = currentStreak >= 3 ? 50 : 0;
-                    setStreaks(s => ({ ...s, [streakKey]: currentStreak }));
-                    setPlayers(p => p.map((pl, i) => i === buzzerPlayer
-                        ? { ...pl, score: pl.score + q.points + timeBonus + streakBonus, correct: pl.correct + 1, buzzFirst: pl.buzzFirst + 1 }
-                        : pl
-                    ));
-                } else {
-                    playWrong();
-                    setShakeWrong(true);
-                    setStreaks(s => ({ ...s, [buzzerPlayer]: 0 }));
-                    setTimeout(() => setShakeWrong(false), 500);
-                }
-                setShowAnswer(true);
-                setPhase(PHASE.REVEAL);
-            };
+function stopTimer() { if(timerInterval){clearInterval(timerInterval);timerInterval=null;} }
 
-            const nextQuestion = () => {
-                if (currentQ + 1 >= QUESTIONS.length) {
-                    setPhase(PHASE.FINAL);
-                    return;
-                }
-                const next = currentQ + 1;
-                setCurrentQ(next);
-                setTimer(QUESTIONS[next].timeLimit);
-                setShowAnswer(false);
-                setBuzzerPlayer(null);
-                setSelectedOption(null);
-                setPhase(PHASE.PLAYING);
-                setQuestionRevealed(true);
-            };
+function startTimer() {
+  stopTimer();
+  timerInterval = setInterval(function(){
+    state.timer--;
+    if (state.timer <= 5 && state.timer > 0) sndTick();
+    if (state.timer <= 0) {
+      stopTimer();
+      state.showAnswer = true;
+      sndWrong();
+    }
+    render();
+  }, 1000);
+}
 
-            const showLeaderboard = () => setPhase(PHASE.LEADERBOARD);
-            const backToGame = () => setPhase(showAnswer ? PHASE.REVEAL : PHASE.PLAYING);
+// ══════════════════════════════════════════
+//  PARTICLES
+// ══════════════════════════════════════════
+function initParticles() {
+  var c = $("particles");
+  for (var i = 0; i < 15; i++) {
+    var p = document.createElement("div");
+    p.className = "particle";
+    p.style.left = (Math.random()*100)+"%";
+    p.style.background = "hsl("+(Math.random()*60+160)+",100%,70%)";
+    p.style.animationDelay = (i*0.4)+"s";
+    p.style.animationDuration = (3+Math.random()*2)+"s";
+    c.appendChild(p);
+  }
+}
 
-            const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
-            const q = QUESTIONS[currentQ];
-            const progress = ((currentQ + 1) / QUESTIONS.length) * 100;
+// ══════════════════════════════════════════
+//  ACTIONS
+// ══════════════════════════════════════════
+function addPlayer(name) {
+  if (name.trim() && state.players.length < 20) {
+    state.players.push({name:name.trim(),score:0,correct:0,buzzFirst:0});
+    render();
+  }
+}
+function removePlayer(idx) { state.players.splice(idx,1); render(); }
+function clearPlayers() { state.players=[]; render(); }
 
-            return (
-                <div style={{
-                    minHeight: "100vh", background: "#0a0e17",
-                    fontFamily: "'Segoe UI', system-ui, sans-serif", color: "#e0e6f0", overflow: "hidden", position: "relative"
-                }}>
-                    {Array.from({ length: 15 }).map((_, i) => (
-                        <Particle key={i} delay={i * 0.4} x={Math.random() * 100} />
-                    ))}
+function launchQuestion(idx) {
+  var q = QUESTIONS[idx];
+  var d = q.diff;
+  if (!state.diffIntroShown[d] && (idx===0||idx===10||idx===20)) {
+    state.diffIntroShown[d] = true;
+    state.currentQ = idx;
+    state.phase = "diff_intro";
+    sndLevelUp();
+    render();
+    return;
+  }
+  state.currentQ = idx;
+  state.phase = "playing";
+  state.timer = q.time;
+  state.showAnswer = false;
+  state.selectedOpt = null;
+  state.buzzerPlayer = null;
+  state.lastResult = null;
+  startTimer();
+  render();
+}
 
-                    {/* SETUP PHASE */}
-                    {phase === PHASE.SETUP && (
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", padding: "20px", position: "relative", zIndex: 1 }}>
-                            <div style={{
-                                position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-                                background: "radial-gradient(ellipse at 30% 20%, rgba(0,255,170,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(100,80,255,0.06) 0%, transparent 50%)",
-                                pointerEvents: "none"
-                            }} />
-                            <div style={{ textAlign: "center", marginBottom: "40px", animation: "slideUp 0.6s ease-out", position: "relative" }}>
-                                <div style={{ fontSize: "12px", letterSpacing: "6px", color: "#00ffaa", fontFamily: "Orbitron", marginBottom: "12px", textTransform: "uppercase" }}>⚡ Challenge</div>
-                                <h1 style={{
-                                    fontFamily: "Orbitron", fontSize: "clamp(28px, 5vw, 52px)", fontWeight: 900,
-                                    background: "linear-gradient(135deg, #00ffaa, #00ccff, #8b5cf6)",
-                                    backgroundSize: "200% 200%", animation: "gradientShift 4s ease infinite",
-                                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", lineHeight: 1.1
-                                }}>AGENTIC AI</h1>
-                                <h2 style={{ fontFamily: "Orbitron", fontSize: "clamp(16px, 3vw, 24px)", color: "#667", fontWeight: 400, marginTop: "4px", letterSpacing: "3px" }}>RAPID QUIZ</h2>
-                                <div style={{ width: "60px", height: "3px", background: "linear-gradient(90deg, #00ffaa, #00ccff)", margin: "16px auto", borderRadius: "2px" }} />
-                                <p style={{ fontFamily: "Exo 2", color: "#889", fontSize: "14px" }}>{QUESTIONS.length} Questions · Speed Matters · First Buzz Wins</p>
-                            </div>
+function startQuiz() { if(state.players.length<1) return; launchQuestion(0); }
 
-                            <div style={{
-                                background: "rgba(15,20,35,0.8)", border: "1px solid rgba(0,255,170,0.15)", borderRadius: "16px",
-                                padding: "28px", width: "100%", maxWidth: "480px", backdropFilter: "blur(20px)", animation: "slideUp 0.8s ease-out"
-                            }}>
-                                <div style={{ fontFamily: "Orbitron", fontSize: "11px", letterSpacing: "3px", color: "#00ffaa", marginBottom: "16px" }}>ADD PLAYERS</div>
-                                <div style={{ display: "flex", gap: "8px", marginBottom: "20px" }}>
-                                    <input
-                                        value={newPlayer}
-                                        onChange={e => setNewPlayer(e.target.value)}
-                                        onKeyDown={e => e.key === "Enter" && addPlayer()}
-                                        placeholder="Enter player name..."
-                                        style={{
-                                            flex: 1, padding: "12px 16px", background: "rgba(0,255,170,0.05)", border: "1px solid rgba(0,255,170,0.2)",
-                                            borderRadius: "10px", color: "#e0e6f0", fontSize: "15px", fontFamily: "Exo 2", outline: "none"
-                                        }}
-                                    />
-                                    <button onClick={addPlayer} style={{
-                                        padding: "12px 20px", background: "linear-gradient(135deg, #00ffaa, #00cc88)", border: "none",
-                                        borderRadius: "10px", color: "#0a0e17", fontFamily: "Orbitron", fontWeight: 700, fontSize: "13px", cursor: "pointer"
-                                    }}>+</button>
-                                </div>
+function proceedFromIntro() {
+  var q = QUESTIONS[state.currentQ];
+  state.phase = "playing";
+  state.timer = q.time;
+  state.showAnswer = false;
+  state.selectedOpt = null;
+  state.buzzerPlayer = null;
+  state.lastResult = null;
+  startTimer();
+  render();
+}
 
-                                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "20px", minHeight: "40px" }}>
-                                    {players.map((p, i) => (
-                                        <div key={i} style={{
-                                            display: "flex", alignItems: "center", gap: "8px", padding: "8px 14px",
-                                            background: `rgba(${[0, 255, 170][i % 3] || 100}, ${[255, 170, 100][i % 3] || 200}, ${[170, 0, 255][i % 3] || 150}, 0.1)`,
-                                            border: `1px solid rgba(${[0, 255, 170][i % 3] || 100}, ${[255, 170, 100][i % 3] || 200}, ${[170, 0, 255][i % 3] || 150}, 0.3)`,
-                                            borderRadius: "20px", animation: `fadeSlideUp 0.3s ${i * 0.1}s both`
-                                        }}>
-                                            <div style={{
-                                                width: "24px", height: "24px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-                                                background: `hsl(${i * 45 + 160}, 80%, 50%)`, fontSize: "11px", fontWeight: 700, color: "#0a0e17"
-                                            }}>{p.name[0].toUpperCase()}</div>
-                                            <span style={{ fontFamily: "Exo 2", fontSize: "13px", fontWeight: 600, color: "#e0e6f0" }}>{p.name}</span>
-                                            <span onClick={() => setPlayers(pl => pl.filter((_, j) => j !== i))} style={{ cursor: "pointer", opacity: 0.5, fontSize: "16px", marginLeft: "4px", color: "#e0e6f0" }}>×</span>
-                                        </div>
-                                    ))}
-                                </div>
+function handleBuzz(idx) {
+  if (state.buzzerPlayer !== null || state.showAnswer) return;
+  sndBuzz();
+  state.buzzerPlayer = idx;
+  state.phase = "buzzer";
+  stopTimer();
+  render();
+}
 
-                                <button onClick={startQuiz} disabled={players.length < 1} style={{
-                                    width: "100%", padding: "16px", background: players.length >= 1 ? "linear-gradient(135deg, #00ffaa, #00ccff)" : "rgba(255,255,255,0.1)",
-                                    border: "none", borderRadius: "12px", color: "#0a0e17", fontFamily: "Orbitron", fontWeight: 900,
-                                    fontSize: "16px", cursor: players.length >= 1 ? "pointer" : "default", letterSpacing: "2px",
-                                    animation: players.length >= 1 ? "glow 2s infinite" : "none", transition: "all 0.3s"
-                                }}>
-                                    {players.length < 1 ? "ADD PLAYERS TO START" : "START QUIZ →"}
-                                </button>
-                            </div>
-                        </div>
-                    )}
+function handleAnswer(optIdx) {
+  var q = QUESTIONS[state.currentQ];
+  var correct = (optIdx === q.ans);
+  state.selectedOpt = optIdx;
+  if (correct) {
+    sndCorrect();
+    var timeBonus = Math.floor(state.timer * 5);
+    var sk = state.buzzerPlayer;
+    var cs = (state.streaks[sk]||0) + 1;
+    var sb = cs >= 3 ? 50 : 0;
+    state.streaks[sk] = cs;
+    var p = state.players[state.buzzerPlayer];
+    var total = q.pts + timeBonus + sb;
+    p.score += total;
+    p.correct += 1;
+    p.buzzFirst += 1;
+    state.lastResult = {correct:true, player:p.name, base:q.pts, timeBonus:timeBonus, streak:sb, total:total};
+  } else {
+    sndWrong();
+    state.streaks[state.buzzerPlayer] = 0;
+    state.lastResult = {correct:false, player:state.players[state.buzzerPlayer].name, base:0, timeBonus:0, streak:0, total:0};
+  }
+  state.showAnswer = true;
+  state.phase = "reveal";
+  render();
+}
 
-                    {/* GAME PHASES */}
-                    {(phase === PHASE.PLAYING || phase === PHASE.BUZZER || phase === PHASE.REVEAL) && (
-                        <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }}>
-                            <div style={{
-                                display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 20px",
-                                background: "rgba(10,14,23,0.95)", borderBottom: "1px solid rgba(0,255,170,0.1)"
-                            }}>
-                                <div style={{ fontFamily: "Orbitron", fontSize: "11px", color: "#00ffaa", letterSpacing: "2px" }}>
-                                    Q{currentQ + 1}/{QUESTIONS.length}
-                                </div>
-                                <div style={{ flex: 1, margin: "0 16px", height: "4px", background: "rgba(255,255,255,0.05)", borderRadius: "2px", overflow: "hidden" }}>
-                                    <div style={{ width: `${progress}%`, height: "100%", background: "linear-gradient(90deg, #00ffaa, #00ccff)", borderRadius: "2px", transition: "width 0.5s" }} />
-                                </div>
-                                <button onClick={showLeaderboard} style={{
-                                    padding: "6px 14px", background: "rgba(0,255,170,0.1)", border: "1px solid rgba(0,255,170,0.3)",
-                                    borderRadius: "8px", color: "#00ffaa", fontFamily: "Orbitron", fontSize: "10px", cursor: "pointer", letterSpacing: "1px"
-                                }}>🏆 SCORES</button>
-                            </div>
+function nextQuestion() {
+  if (state.currentQ + 1 >= QUESTIONS.length) { state.phase = "final"; render(); return; }
+  launchQuestion(state.currentQ + 1);
+}
 
-                            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "20px", maxWidth: "800px", margin: "0 auto", width: "100%" }}>
-                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: "16px" }}>
-                                    <div style={{
-                                        padding: "6px 16px", background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)",
-                                        borderRadius: "20px", fontFamily: "Orbitron", fontSize: "10px", letterSpacing: "2px", color: "#a78bfa"
-                                    }}>{q.category}</div>
-                                    <div style={{
-                                        display: "flex", alignItems: "center", gap: "8px",
-                                        animation: timer <= 5 && !showAnswer ? "timerPulse 0.5s infinite" : "none"
-                                    }}>
-                                        <div style={{
-                                            fontFamily: "Orbitron", fontSize: "28px", fontWeight: 900,
-                                            color: timer <= 5 ? "#ff4444" : timer <= 10 ? "#ffaa00" : "#00ffaa",
-                                            textShadow: timer <= 5 ? "0 0 20px rgba(255,68,68,0.5)" : "none",
-                                            transition: "color 0.3s"
-                                        }}>{timer}s</div>
-                                    </div>
-                                    <div style={{
-                                        padding: "6px 14px", background: "rgba(0,255,170,0.1)", border: "1px solid rgba(0,255,170,0.2)",
-                                        borderRadius: "20px", fontFamily: "Orbitron", fontSize: "10px", color: "#00ffaa"
-                                    }}>🎯 {q.points} PTS</div>
-                                </div>
+function showLB()  { state.phase = "leaderboard"; render(); }
+function backToGame() { state.phase = state.showAnswer ? "reveal" : "playing"; if(state.phase==="playing") startTimer(); render(); }
+function playAgain() {
+  state.phase = "setup";
+  state.players.forEach(function(p){p.score=0;p.correct=0;p.buzzFirst=0});
+  state.currentQ = 0;
+  state.streaks = {};
+  state.diffIntroShown = {};
+  stopTimer();
+  render();
+}
 
-                                <div style={{
-                                    background: "rgba(15,20,35,0.9)", border: "1px solid rgba(0,255,170,0.15)", borderRadius: "20px",
-                                    padding: "28px", width: "100%", marginBottom: "20px", backdropFilter: "blur(20px)",
-                                    animation: questionRevealed ? "slideUp 0.5s ease-out" : "none",
-                                    ...(shakeWrong ? { animation: "shake 0.5s" } : {})
-                                }}>
-                                    <h2 style={{
-                                        fontFamily: "Exo 2", fontSize: "clamp(17px, 2.5vw, 22px)", fontWeight: 600, lineHeight: 1.5,
-                                        color: "#f0f4ff", textAlign: "center"
-                                    }}>{q.question}</h2>
-                                </div>
+// ══════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════
+function render() {
+  var app = $("app");
+  app.innerHTML = "";
 
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", width: "100%", marginBottom: "16px" }}>
-                                    {q.options.map((opt, i) => {
-                                        const isCorrect = i === q.correct;
-                                        const isSelected = selectedOption === i;
-                                        let bg = "rgba(20,28,50,0.8)";
-                                        let borderColor = "rgba(100,120,180,0.2)";
-                                        if (showAnswer && isCorrect) { bg = "rgba(0,255,170,0.15)"; borderColor = "#00ffaa"; }
-                                        else if (showAnswer && isSelected && !isCorrect) { bg = "rgba(255,68,68,0.15)"; borderColor = "#ff4444"; }
-                                        const labels = ["A", "B", "C", "D"];
-                                        return (
-                                            <button key={i} onClick={() => { if (!showAnswer && phase === PHASE.BUZZER) { setSelectedOption(i); handleAnswer(isCorrect); } }}
-                                                style={{
-                                                    display: "flex", alignItems: "center", gap: "12px", padding: "14px 16px",
-                                                    background: bg, border: `1px solid ${borderColor}`, borderRadius: "14px",
-                                                    color: showAnswer && isCorrect ? "#00ffaa" : "#c0c8e0", fontFamily: "Exo 2", fontSize: "14px",
-                                                    fontWeight: 500, cursor: phase === PHASE.BUZZER && !showAnswer ? "pointer" : "default",
-                                                    transition: "all 0.3s", textAlign: "left",
-                                                    animation: showAnswer && isCorrect ? "glow 1.5s infinite" : `fadeSlideUp 0.3s ${i * 0.08}s both`
-                                                }}>
-                                                <span style={{
-                                                    minWidth: "30px", height: "30px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center",
-                                                    background: showAnswer && isCorrect ? "rgba(0,255,170,0.2)" : "rgba(100,120,180,0.15)",
-                                                    fontFamily: "Orbitron", fontSize: "12px", fontWeight: 700
-                                                }}>{labels[i]}</span>
-                                                {opt}
-                                                {showAnswer && isCorrect && <span style={{ marginLeft: "auto", fontSize: "18px" }}>✓</span>}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
+  // ─── SETUP ───
+  if (state.phase === "setup") {
+    var wrap = h("div",{className:"screen"});
+    // Title
+    var title = h("div",{style:{textAlign:"center",marginBottom:"32px",animation:"slideUp 0.6s ease-out"}});
+    title.appendChild(h("div",{className:"orb",style:{fontSize:"12px",letterSpacing:"6px",color:"#00ffaa",marginBottom:"12px",textTransform:"uppercase"}},"\u26A1 Challenge"));
+    var h1 = h("h1",{className:"orb",style:{fontSize:"clamp(28px,5vw,52px)",fontWeight:900,background:"linear-gradient(135deg,#00ffaa,#00ccff,#8b5cf6)",backgroundSize:"200% 200%",animation:"gradShift 4s ease infinite",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",lineHeight:"1.1"}},"AGENTIC AI");
+    title.appendChild(h1);
+    title.appendChild(h("h2",{className:"orb",style:{fontSize:"clamp(16px,3vw,24px)",color:"#667",fontWeight:400,marginTop:"4px",letterSpacing:"3px"}},"RAPID QUIZ"));
+    title.appendChild(h("div",{style:{width:"60px",height:"3px",background:"linear-gradient(90deg,#00ffaa,#00ccff)",margin:"14px auto",borderRadius:"2px"}}));
+    title.appendChild(h("p",{style:{color:"#889",fontSize:"14px"}},"30 Questions \xb7 3 Difficulty Levels \xb7 Speed Matters"));
+    var badges = h("div",{style:{display:"flex",gap:"12px",justifyContent:"center",marginTop:"12px"}});
+    ["EASY","MEDIUM","HARD"].forEach(function(d){
+      badges.appendChild(h("div",{className:"orb diff-badge diff-"+d},DIFF[d].icon+" "+d));
+    });
+    title.appendChild(badges);
+    wrap.appendChild(title);
 
-                                {showAnswer && (
-                                    <div style={{
-                                        background: "rgba(0,255,170,0.05)", border: "1px solid rgba(0,255,170,0.15)", borderRadius: "14px",
-                                        padding: "16px 20px", width: "100%", marginBottom: "16px", animation: "fadeSlideUp 0.4s ease-out"
-                                    }}>
-                                        <div style={{ fontFamily: "Orbitron", fontSize: "9px", letterSpacing: "2px", color: "#00ffaa", marginBottom: "8px" }}>💡 EXPLANATION</div>
-                                        <p style={{ fontFamily: "Exo 2", fontSize: "13px", color: "#99aabb", lineHeight: 1.6 }}>{q.explanation}</p>
-                                    </div>
-                                )}
+    // Card
+    var card = h("div",{className:"card",style:{animation:"slideUp 0.8s ease-out"}});
 
-                                {phase === PHASE.BUZZER && !showAnswer && (
-                                    <div style={{
-                                        background: "rgba(255,200,0,0.08)", border: "1px solid rgba(255,200,0,0.2)", borderRadius: "14px",
-                                        padding: "16px", width: "100%", textAlign: "center", animation: "fadeSlideUp 0.3s"
-                                    }}>
-                                        <div style={{ fontFamily: "Orbitron", fontSize: "14px", color: "#ffcc00", marginBottom: "8px" }}>
-                                            🔔 {players[buzzerPlayer]?.name} BUZZED IN!
-                                        </div>
-                                        <p style={{ fontFamily: "Exo 2", fontSize: "12px", color: "#889" }}>Host: Click the correct answer, or mark wrong below</p>
-                                        <button onClick={() => handleAnswer(false)} style={{
-                                            marginTop: "8px", padding: "8px 20px", background: "rgba(255,68,68,0.15)", border: "1px solid rgba(255,68,68,0.3)",
-                                            borderRadius: "8px", color: "#ff6666", fontFamily: "Orbitron", fontSize: "11px", cursor: "pointer"
-                                        }}>✗ WRONG ANSWER</button>
-                                    </div>
-                                )}
+    // Add player input
+    card.appendChild(h("div",{className:"orb",style:{fontSize:"11px",letterSpacing:"3px",color:"#00ffaa",marginBottom:"14px"}},"ADD PLAYERS"));
+    var row = h("div",{style:{display:"flex",gap:"8px",marginBottom:"16px"}});
+    var inp = h("input",{type:"text",placeholder:"Enter player name...",style:{flex:"1",padding:"12px 16px",background:"rgba(0,255,170,0.05)",border:"1px solid rgba(0,255,170,0.2)",borderRadius:"10px",color:"#e0e6f0",fontSize:"15px",outline:"none"}});
+    inp.addEventListener("keydown",function(e){if(e.key==="Enter"){addPlayer(inp.value);inp.value="";}});
+    row.appendChild(inp);
+    row.appendChild(h("button",{className:"orb",style:{padding:"12px 20px",background:"linear-gradient(135deg,#00ffaa,#00cc88)",border:"none",borderRadius:"10px",color:"#0a0e17",fontWeight:700,fontSize:"13px"},onClick:function(){addPlayer(inp.value);inp.value="";}},"+"));
+    card.appendChild(row);
 
-                                {phase === PHASE.PLAYING && !showAnswer && (
-                                    <div style={{ width: "100%" }}>
-                                        <div style={{ fontFamily: "Orbitron", fontSize: "10px", letterSpacing: "2px", color: "#556", textAlign: "center", marginBottom: "10px" }}>
-                                            🔴 BUZZ IN!
-                                        </div>
-                                        <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(players.length, 5)}, 1fr)`, gap: "8px" }}>
-                                            {players.map((p, i) => (
-                                                <button key={i} className="buzzer-btn" onClick={() => handleBuzz(i)} style={{
-                                                    padding: "14px 8px", background: `linear-gradient(135deg, hsl(${i * 45 + 160}, 70%, 25%), hsl(${i * 45 + 180}, 70%, 15%))`,
-                                                    border: `2px solid hsl(${i * 45 + 160}, 80%, 50%)`, borderRadius: "14px",
-                                                    color: `hsl(${i * 45 + 160}, 80%, 75%)`, fontFamily: "Orbitron", fontSize: "11px", fontWeight: 700,
-                                                    cursor: "pointer", transition: "transform 0.1s", animation: "borderGlow 2s infinite",
-                                                    textAlign: "center", letterSpacing: "1px"
-                                                }}>
-                                                    <div style={{ fontSize: "22px", marginBottom: "4px" }}>🔴</div>
-                                                    {p.name}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+    // Chips
+    var chips = h("div",{style:{display:"flex",flexWrap:"wrap",gap:"8px",marginBottom:"18px",minHeight:"36px"}});
+    state.players.forEach(function(p,i){
+      var hue = i*32+160;
+      var chip = h("div",{className:"chip",style:{background:"hsla("+hue+",70%,50%,0.1)",border:"1px solid hsla("+hue+",70%,50%,0.3)",animationDelay:(i*0.04)+"s"}});
+      chip.appendChild(h("div",{className:"chip-avatar",style:{background:"hsl("+hue+",75%,50%)"}},p.name[0].toUpperCase()));
+      chip.appendChild(h("span",{style:{fontSize:"12px",fontWeight:600}},p.name));
+      var x = h("span",{className:"chip-x",onClick:function(){removePlayer(i)}},"\xd7");
+      chip.appendChild(x);
+      chips.appendChild(chip);
+    });
+    card.appendChild(chips);
 
-                                {showAnswer && (
-                                    <button onClick={nextQuestion} style={{
-                                        padding: "14px 40px", background: "linear-gradient(135deg, #00ffaa, #00ccff)", border: "none",
-                                        borderRadius: "12px", color: "#0a0e17", fontFamily: "Orbitron", fontWeight: 900, fontSize: "14px",
-                                        cursor: "pointer", letterSpacing: "2px", marginTop: "8px", animation: "pulse 2s infinite"
-                                    }}>
-                                        {currentQ + 1 >= QUESTIONS.length ? "🏆 FINAL RESULTS" : "NEXT →"}
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    )}
+    if (state.players.length > 0) {
+      var ctrls = h("div",{style:{display:"flex",gap:"8px",marginBottom:"14px"}});
+      ctrls.appendChild(h("button",{className:"orb",style:{padding:"8px 16px",background:"rgba(255,68,68,0.1)",border:"1px solid rgba(255,68,68,0.2)",borderRadius:"8px",color:"#ff6666",fontSize:"10px"},onClick:clearPlayers},"CLEAR ALL"));
+      ctrls.appendChild(h("div",{style:{fontSize:"13px",color:"#667",display:"flex",alignItems:"center"}},state.players.length+" player"+(state.players.length!==1?"s":"")+" ready"));
+      card.appendChild(ctrls);
+    }
 
-                    {/* LEADERBOARD */}
-                    {phase === PHASE.LEADERBOARD && (
-                        <div style={{
-                            minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center",
-                            justifyContent: "center", padding: "20px", position: "relative", zIndex: 2
-                        }}>
-                            <div style={{ textAlign: "center", marginBottom: "30px" }}>
-                                <div style={{ fontFamily: "Orbitron", fontSize: "10px", letterSpacing: "4px", color: "#00ffaa", marginBottom: "8px" }}>LIVE</div>
-                                <h2 style={{ fontFamily: "Orbitron", fontSize: "28px", fontWeight: 900, color: "#f0f4ff" }}>🏆 LEADERBOARD</h2>
-                            </div>
-                            <div style={{ width: "100%", maxWidth: "500px" }}>
-                                {sortedPlayers.map((p, i) => (
-                                    <div key={p.name} style={{
-                                        display: "flex", alignItems: "center", gap: "14px", padding: "14px 18px", marginBottom: "8px",
-                                        background: i === 0 ? "rgba(255,215,0,0.1)" : "rgba(15,20,35,0.8)",
-                                        border: `1px solid ${i === 0 ? "rgba(255,215,0,0.3)" : "rgba(100,120,180,0.1)"}`,
-                                        borderRadius: "14px", animation: `slideIn 0.4s ${i * 0.1}s both`
-                                    }}>
-                                        <div style={{
-                                            fontFamily: "Orbitron", fontSize: "18px", fontWeight: 900, minWidth: "36px",
-                                            color: i === 0 ? "#ffd700" : i === 1 ? "#c0c0c0" : i === 2 ? "#cd7f32" : "#556"
-                                        }}>{i === 0 ? "👑" : `#${i + 1}`}</div>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontFamily: "Exo 2", fontWeight: 700, fontSize: "16px", color: "#e0e6f0" }}>{p.name}</div>
-                                            <div style={{ fontFamily: "Exo 2", fontSize: "11px", color: "#667" }}>
-                                                {p.correct} correct · {p.buzzFirst} first buzz{p.buzzFirst !== 1 ? "es" : ""}
-                                            </div>
-                                        </div>
-                                        <div style={{
-                                            fontFamily: "Orbitron", fontSize: "20px", fontWeight: 900,
-                                            color: i === 0 ? "#ffd700" : "#00ffaa"
-                                        }}>{p.score}</div>
-                                    </div>
-                                ))}
-                            </div>
-                            <button onClick={backToGame} style={{
-                                marginTop: "24px", padding: "12px 32px", background: "rgba(0,255,170,0.1)",
-                                border: "1px solid rgba(0,255,170,0.3)", borderRadius: "10px", color: "#00ffaa",
-                                fontFamily: "Orbitron", fontSize: "12px", cursor: "pointer", letterSpacing: "2px"
-                            }}>← BACK TO QUIZ</button>
-                        </div>
-                    )}
+    var ready = state.players.length >= 1;
+    var startBtn = h("button",{className:"orb",style:{width:"100%",padding:"16px",background:ready?"linear-gradient(135deg,#00ffaa,#00ccff)":"rgba(255,255,255,0.1)",border:"none",borderRadius:"12px",color:"#0a0e17",fontWeight:900,fontSize:"16px",letterSpacing:"2px",animation:ready?"glow 2s infinite":"none",cursor:ready?"pointer":"default"},onClick:startQuiz},ready?"START QUIZ \u2192":"ADD PLAYERS TO START");
+    card.appendChild(startBtn);
+    wrap.appendChild(card);
+    app.appendChild(wrap);
+    return;
+  }
 
-                    {/* FINAL RESULTS */}
-                    {phase === PHASE.FINAL && (
-                        <div style={{
-                            minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center",
-                            justifyContent: "center", padding: "20px", position: "relative", zIndex: 2
-                        }}>
-                            <div style={{
-                                position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-                                background: "radial-gradient(ellipse at 50% 30%, rgba(255,215,0,0.08) 0%, transparent 60%)",
-                                pointerEvents: "none"
-                            }} />
-                            <div style={{ animation: "celebrate 1s ease-in-out", textAlign: "center", marginBottom: "32px" }}>
-                                <div style={{ fontSize: "60px", marginBottom: "8px", animation: "crownBounce 1.5s infinite" }}>👑</div>
-                                <div style={{ fontFamily: "Orbitron", fontSize: "10px", letterSpacing: "4px", color: "#ffd700", marginBottom: "8px" }}>CHAMPION</div>
-                                <h1 style={{
-                                    fontFamily: "Orbitron", fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 900,
-                                    background: "linear-gradient(135deg, #ffd700, #ffaa00, #ff8800)",
-                                    WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent"
-                                }}>{sortedPlayers[0]?.name}</h1>
-                                <div style={{ fontFamily: "Orbitron", fontSize: "32px", color: "#ffd700", marginTop: "8px" }}>
-                                    {sortedPlayers[0]?.score} PTS
-                                </div>
-                            </div>
-                            <div style={{ width: "100%", maxWidth: "550px" }}>
-                                <div style={{ fontFamily: "Orbitron", fontSize: "10px", letterSpacing: "3px", color: "#556", textAlign: "center", marginBottom: "16px" }}>FINAL STANDINGS</div>
-                                {sortedPlayers.map((p, i) => (
-                                    <div key={p.name} style={{
-                                        display: "flex", alignItems: "center", gap: "14px", padding: "16px 20px", marginBottom: "8px",
-                                        background: i === 0 ? "linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,170,0,0.08))" : "rgba(15,20,35,0.8)",
-                                        border: `1px solid ${i === 0 ? "rgba(255,215,0,0.4)" : i === 1 ? "rgba(192,192,192,0.2)" : i === 2 ? "rgba(205,127,50,0.2)" : "rgba(100,120,180,0.1)"}`,
-                                        borderRadius: "16px", animation: `slideIn 0.5s ${i * 0.15}s both`
-                                    }}>
-                                        <div style={{
-                                            width: "40px", height: "40px", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center",
-                                            background: i === 0 ? "rgba(255,215,0,0.2)" : i === 1 ? "rgba(192,192,192,0.15)" : i === 2 ? "rgba(205,127,50,0.15)" : "rgba(50,60,90,0.5)",
-                                            fontFamily: "Orbitron", fontSize: i < 3 ? "20px" : "14px", fontWeight: 900,
-                                            color: i === 0 ? "#ffd700" : i === 1 ? "#c0c0c0" : i === 2 ? "#cd7f32" : "#556"
-                                        }}>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}</div>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontFamily: "Exo 2", fontWeight: 700, fontSize: "17px", color: i === 0 ? "#ffd700" : "#e0e6f0" }}>{p.name}</div>
-                                            <div style={{ fontFamily: "Exo 2", fontSize: "12px", color: "#778", marginTop: "2px" }}>
-                                                {p.correct}/{QUESTIONS.length} correct · {p.buzzFirst} first buzz · {Math.round((p.correct / QUESTIONS.length) * 100)}% accuracy
-                                            </div>
-                                        </div>
-                                        <div style={{
-                                            fontFamily: "Orbitron", fontSize: "22px", fontWeight: 900,
-                                            color: i === 0 ? "#ffd700" : i === 1 ? "#c0c0c0" : "#00ffaa"
-                                        }}>{p.score}</div>
-                                    </div>
-                                ))}
-                            </div>
-                            <button onClick={() => { setPhase(PHASE.SETUP); setPlayers(p => p.map(pl => ({ ...pl, score: 0, correct: 0, buzzFirst: 0 }))); setCurrentQ(0); setStreaks({}); }}
-                                style={{
-                                    marginTop: "32px", padding: "14px 36px", background: "linear-gradient(135deg, #00ffaa, #00ccff)",
-                                    border: "none", borderRadius: "12px", color: "#0a0e17", fontFamily: "Orbitron", fontWeight: 900,
-                                    fontSize: "14px", cursor: "pointer", letterSpacing: "2px"
-                                }}>
-                                🔄 PLAY AGAIN
-                            </button>
-                        </div>
-                    )}
-                </div>
-            );
-        }
+  // ─── DIFFICULTY INTRO ───
+  if (state.phase === "diff_intro") {
+    var q = QUESTIONS[state.currentQ];
+    var dc = DIFF[q.diff];
+    var wrap = h("div",{className:"screen",style:{cursor:"pointer"},onClick:proceedFromIntro});
+    var glow = h("div",{style:{position:"absolute",inset:"0",background:"radial-gradient(ellipse at 50% 40%,"+dc.bg.replace("0.12","0.18")+" 0%,transparent 60%)",pointerEvents:"none"}});
+    wrap.appendChild(glow);
+    var inner = h("div",{style:{animation:"diffFlash 0.6s ease-out",textAlign:"center"}});
+    inner.appendChild(h("div",{style:{fontSize:"80px",marginBottom:"16px"}},dc.icon));
+    inner.appendChild(h("div",{className:"orb",style:{fontSize:"clamp(36px,7vw,64px)",fontWeight:900,color:dc.color,letterSpacing:"6px",marginBottom:"12px"}},dc.label));
+    inner.appendChild(h("div",{style:{fontSize:"16px",color:"#889",marginBottom:"8px"}},dc.desc));
+    inner.appendChild(h("div",{style:{fontSize:"14px",color:"#556",marginTop:"20px",animation:"pulse 2s infinite"}},"Click anywhere to begin"));
+    wrap.appendChild(inner);
+    app.appendChild(wrap);
+    return;
+  }
 
-        ReactDOM.createRoot(document.getElementById("root")).render(<AgenticQuiz />);
-    </script>
+  // ─── PLAYING / BUZZER / REVEAL ───
+  if (state.phase === "playing" || state.phase === "buzzer" || state.phase === "reveal") {
+    var q = QUESTIONS[state.currentQ];
+    var dc = DIFF[q.diff];
+    var progress = ((state.currentQ+1)/QUESTIONS.length)*100;
+    var page = h("div",{style:{minHeight:"100vh",display:"flex",flexDirection:"column",position:"relative",zIndex:"1"}});
+
+    // Top bar
+    var topBar = h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"12px 20px",background:"rgba(10,14,23,0.95)",borderBottom:"1px solid "+dc.border}});
+    topBar.appendChild(h("div",{className:"orb",style:{fontSize:"11px",color:dc.color,letterSpacing:"2px"}},"Q"+(state.currentQ+1)+"/"+QUESTIONS.length));
+    var progWrap = h("div",{style:{flex:"1",margin:"0 16px",height:"4px",background:"rgba(255,255,255,0.05)",borderRadius:"2px",overflow:"hidden"}});
+    progWrap.appendChild(h("div",{style:{width:progress+"%",height:"100%",background:"linear-gradient(90deg,"+dc.color+",#00ccff)",borderRadius:"2px",transition:"width 0.5s"}}));
+    topBar.appendChild(progWrap);
+    topBar.appendChild(h("button",{className:"orb",style:{padding:"6px 14px",background:"rgba(0,255,170,0.1)",border:"1px solid rgba(0,255,170,0.3)",borderRadius:"8px",color:"#00ffaa",fontSize:"10px",letterSpacing:"1px"},onClick:showLB},"\u{1F3C6} SCORES"));
+    page.appendChild(topBar);
+
+    // Content
+    var content = h("div",{style:{flex:"1",display:"flex",flexDirection:"column",alignItems:"center",padding:"16px 20px",maxWidth:"800px",margin:"0 auto",width:"100%"}});
+
+    // Meta row
+    var meta = h("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",marginBottom:"14px",flexWrap:"wrap",gap:"8px"}});
+    var tags = h("div",{style:{display:"flex",gap:"8px"}});
+    tags.appendChild(h("div",{className:"orb",style:{padding:"5px 14px",background:"rgba(139,92,246,0.15)",border:"1px solid rgba(139,92,246,0.3)",borderRadius:"20px",fontSize:"9px",letterSpacing:"2px",color:"#a78bfa"}},q.cat));
+    tags.appendChild(h("div",{className:"orb diff-badge diff-"+q.diff},dc.icon+" "+dc.label));
+    meta.appendChild(tags);
+    var timerColor = state.timer<=5?"#ff4444":state.timer<=10?"#ffaa00":"#00ffaa";
+    var timerEl = h("div",{className:"orb",style:{fontSize:"26px",fontWeight:900,color:timerColor,textShadow:state.timer<=5?"0 0 20px rgba(255,68,68,0.5)":"none",transition:"color 0.3s",animation:state.timer<=5&&!state.showAnswer?"timerPulse 0.5s infinite":"none"}},state.timer+"s");
+    meta.appendChild(timerEl);
+    meta.appendChild(h("div",{className:"orb",style:{padding:"5px 14px",background:dc.bg,border:"1px solid "+dc.border,borderRadius:"20px",fontSize:"10px",color:dc.color}},"\u{1F3AF} "+q.pts+" PTS"));
+    content.appendChild(meta);
+
+    // Question
+    var qCard = h("div",{style:{background:"rgba(15,20,35,0.9)",border:"1px solid "+dc.border,borderRadius:"20px",padding:"24px",width:"100%",marginBottom:"16px",backdropFilter:"blur(20px)",animation:"slideUp 0.5s ease-out"}});
+    qCard.appendChild(h("h2",{style:{fontSize:"clamp(16px,2.5vw,21px)",fontWeight:600,lineHeight:"1.5",color:"#f0f4ff",textAlign:"center"}},q.q));
+    content.appendChild(qCard);
+
+    // Options
+    var opts = h("div",{className:"opts"});
+    var labels = ["A","B","C","D"];
+    q.opts.forEach(function(opt,i){
+      var isCorr = i===q.ans;
+      var isSel = state.selectedOpt===i;
+      var cls = "opt-btn";
+      if(state.showAnswer && isCorr) cls += " correct";
+      else if(state.showAnswer && isSel && !isCorr) cls += " wrong";
+      if(state.phase==="buzzer" && !state.showAnswer) cls += " clickable";
+      var btn = h("button",{className:cls,style:{animation:state.showAnswer&&isCorr?"glow 1.5s infinite":"fadeSlideUp 0.3s "+(i*0.08)+"s both"},onClick:function(){
+        if(!state.showAnswer && state.phase==="buzzer") handleAnswer(i);
+      }});
+      btn.appendChild(h("span",{className:"orb opt-label"},labels[i]));
+      btn.appendChild(document.createTextNode(opt));
+      if(state.showAnswer && isCorr) btn.appendChild(h("span",{style:{marginLeft:"auto",fontSize:"18px"}},"\u2713"));
+      opts.appendChild(btn);
+    });
+    content.appendChild(opts);
+
+    // Score result popup
+    if (state.showAnswer && state.lastResult) {
+      var r = state.lastResult;
+      if (r.correct) {
+        var scoreBox = h("div",{style:{background:"rgba(0,255,170,0.08)",border:"1px solid rgba(0,255,170,0.25)",borderRadius:"14px",padding:"14px 20px",width:"100%",marginBottom:"12px",animation:"fadeSlideUp 0.3s",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:"8px"}});
+        scoreBox.appendChild(h("div",{style:{display:"flex",alignItems:"center",gap:"8px"}}, [
+          h("span",{style:{fontSize:"22px"}},"\u2705"),
+          h("span",{className:"orb",style:{fontSize:"14px",fontWeight:700,color:"#00ffaa"}},r.player+" — CORRECT!")
+        ]));
+        var breakdown = h("div",{style:{display:"flex",gap:"12px",alignItems:"center"}});
+        breakdown.appendChild(h("span",{className:"orb",style:{fontSize:"12px",color:"#88bbaa"}},"+"+r.base+" base"));
+        if (r.timeBonus > 0) breakdown.appendChild(h("span",{className:"orb",style:{fontSize:"12px",color:"#88bbaa"}},"+"+r.timeBonus+" speed"));
+        if (r.streak > 0) breakdown.appendChild(h("span",{className:"orb",style:{fontSize:"12px",color:"#ffaa00"}},"+"+r.streak+" streak"));
+        breakdown.appendChild(h("span",{className:"orb",style:{fontSize:"16px",fontWeight:900,color:"#00ffaa"}},"= "+r.total));
+        scoreBox.appendChild(breakdown);
+        content.appendChild(scoreBox);
+      } else {
+        var scoreBox = h("div",{style:{background:"rgba(255,68,68,0.08)",border:"1px solid rgba(255,68,68,0.2)",borderRadius:"14px",padding:"14px 20px",width:"100%",marginBottom:"12px",animation:"fadeSlideUp 0.3s",display:"flex",alignItems:"center",gap:"8px"}});
+        scoreBox.appendChild(h("span",{style:{fontSize:"22px"}},"\u274C"));
+        scoreBox.appendChild(h("span",{className:"orb",style:{fontSize:"14px",fontWeight:700,color:"#ff6666"}},r.player+" — WRONG! +0 pts"));
+        content.appendChild(scoreBox);
+      }
+    }
+
+    // Explanation
+    if (state.showAnswer) {
+      var expBox = h("div",{style:{background:"rgba(0,255,170,0.05)",border:"1px solid rgba(0,255,170,0.15)",borderRadius:"14px",padding:"14px 18px",width:"100%",marginBottom:"14px",animation:"fadeSlideUp 0.4s ease-out"}});
+      expBox.appendChild(h("div",{className:"orb",style:{fontSize:"9px",letterSpacing:"2px",color:"#00ffaa",marginBottom:"6px"}},"\u{1F4A1} EXPLANATION"));
+      expBox.appendChild(h("p",{style:{fontSize:"13px",color:"#99aabb",lineHeight:"1.6"}},q.exp));
+      content.appendChild(expBox);
+    }
+
+    // Buzzer state
+    if (state.phase === "buzzer" && !state.showAnswer) {
+      var bz = h("div",{style:{background:"rgba(255,200,0,0.08)",border:"1px solid rgba(255,200,0,0.2)",borderRadius:"14px",padding:"14px",width:"100%",textAlign:"center",animation:"fadeSlideUp 0.3s"}});
+      bz.appendChild(h("div",{className:"orb",style:{fontSize:"14px",color:"#ffcc00",marginBottom:"6px"}},"\u{1F514} "+state.players[state.buzzerPlayer].name+" BUZZED IN!"));
+      bz.appendChild(h("p",{style:{fontSize:"12px",color:"#889"}},"Host: Click the correct answer, or mark wrong below"));
+      bz.appendChild(h("button",{className:"orb",style:{marginTop:"8px",padding:"8px 20px",background:"rgba(255,68,68,0.15)",border:"1px solid rgba(255,68,68,0.3)",borderRadius:"8px",color:"#ff6666",fontSize:"11px"},onClick:function(){handleAnswer(-1)}},"\u2717 WRONG ANSWER"));
+      content.appendChild(bz);
+    }
+
+    // Buzz buttons
+    if (state.phase === "playing" && !state.showAnswer) {
+      var bw = h("div",{style:{width:"100%"}});
+      bw.appendChild(h("div",{className:"orb",style:{fontSize:"10px",letterSpacing:"2px",color:"#556",textAlign:"center",marginBottom:"8px"}},"\u{1F534} BUZZ IN!"));
+      var cols = Math.min(state.players.length, 5);
+      var grid = h("div",{className:"buzzer-grid",style:{gridTemplateColumns:"repeat("+cols+",1fr)"}});
+      state.players.forEach(function(p,i){
+        var hue = i*32+160;
+        var btn = h("button",{className:"buzzer-btn orb",style:{padding:"12px 6px",background:"linear-gradient(135deg,hsl("+hue+",70%,25%),hsl("+(hue+20)+",70%,15%))",border:"2px solid hsl("+hue+",80%,50%)",borderRadius:"14px",color:"hsl("+hue+",80%,75%)",fontSize:"10px",fontWeight:700,textAlign:"center",letterSpacing:"1px",animation:"borderGlow 2s infinite",transition:"transform 0.1s"},onClick:function(){handleBuzz(i)}});
+        btn.appendChild(h("div",{style:{fontSize:"20px",marginBottom:"3px"}},"\u{1F534}"));
+        btn.appendChild(document.createTextNode(p.name));
+        grid.appendChild(btn);
+      });
+      bw.appendChild(grid);
+      content.appendChild(bw);
+    }
+
+    // Next button
+    if (state.showAnswer) {
+      var label = (state.currentQ+1>=QUESTIONS.length) ? "\u{1F3C6} FINAL RESULTS" : "NEXT \u2192";
+      content.appendChild(h("button",{className:"orb",style:{padding:"13px 36px",background:"linear-gradient(135deg,#00ffaa,#00ccff)",border:"none",borderRadius:"12px",color:"#0a0e17",fontWeight:900,fontSize:"14px",letterSpacing:"2px",marginTop:"6px",animation:"pulse 2s infinite"},onClick:nextQuestion},label));
+    }
+
+    page.appendChild(content);
+    app.appendChild(page);
+    return;
+  }
+
+  // ─── LEADERBOARD ───
+  if (state.phase === "leaderboard") {
+    var wrap = h("div",{className:"screen"});
+    var hdr = h("div",{style:{textAlign:"center",marginBottom:"30px"}});
+    hdr.appendChild(h("div",{className:"orb",style:{fontSize:"10px",letterSpacing:"4px",color:"#00ffaa",marginBottom:"8px"}},"LIVE"));
+    hdr.appendChild(h("h2",{className:"orb",style:{fontSize:"28px",fontWeight:900,color:"#f0f4ff"}},"\u{1F3C6} LEADERBOARD"));
+    wrap.appendChild(hdr);
+    var list = h("div",{className:"scroll-area",style:{width:"100%",maxWidth:"500px"}});
+    sorted().forEach(function(p,i){
+      var row = h("div",{className:"lb-row"+(i===0?" first":""),style:{animation:"slideIn 0.4s "+(i*0.06)+"s both"}});
+      var rankColor = i===0?"#ffd700":i===1?"#c0c0c0":i===2?"#cd7f32":"#556";
+      row.appendChild(h("div",{className:"orb",style:{fontSize:"16px",fontWeight:900,minWidth:"32px",color:rankColor}},i===0?"\u{1F451}":"#"+(i+1)));
+      var info = h("div",{style:{flex:"1"}});
+      info.appendChild(h("div",{style:{fontWeight:700,fontSize:"15px",color:"#e0e6f0"}},p.name));
+      info.appendChild(h("div",{style:{fontSize:"11px",color:"#667"}},p.correct+" correct \xb7 "+p.buzzFirst+" buzz"+(p.buzzFirst!==1?"es":"")));
+      row.appendChild(info);
+      row.appendChild(h("div",{className:"orb",style:{fontSize:"18px",fontWeight:900,color:i===0?"#ffd700":"#00ffaa"}},""+p.score));
+      list.appendChild(row);
+    });
+    wrap.appendChild(list);
+    wrap.appendChild(h("button",{className:"orb",style:{marginTop:"24px",padding:"12px 32px",background:"rgba(0,255,170,0.1)",border:"1px solid rgba(0,255,170,0.3)",borderRadius:"10px",color:"#00ffaa",fontSize:"12px",letterSpacing:"2px"},onClick:backToGame},"\u2190 BACK TO QUIZ"));
+    app.appendChild(wrap);
+    return;
+  }
+
+  // ─── FINAL ───
+  if (state.phase === "final") {
+    var sp = sorted();
+    var wrap = h("div",{className:"screen"});
+    wrap.appendChild(h("div",{style:{position:"absolute",inset:"0",background:"radial-gradient(ellipse at 50% 30%,rgba(255,215,0,0.08) 0%,transparent 60%)",pointerEvents:"none"}}));
+
+    var champ = h("div",{style:{animation:"celebrate 1s ease-in-out",textAlign:"center",marginBottom:"28px"}});
+    champ.appendChild(h("div",{style:{fontSize:"60px",marginBottom:"8px",animation:"crownBounce 1.5s infinite"}},"\u{1F451}"));
+    champ.appendChild(h("div",{className:"orb",style:{fontSize:"10px",letterSpacing:"4px",color:"#ffd700",marginBottom:"8px"}},"CHAMPION"));
+    var champName = h("h1",{className:"orb",style:{fontSize:"clamp(28px,5vw,48px)",fontWeight:900,background:"linear-gradient(135deg,#ffd700,#ffaa00,#ff8800)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}},sp[0]?sp[0].name:"-");
+    champ.appendChild(champName);
+    champ.appendChild(h("div",{className:"orb",style:{fontSize:"32px",color:"#ffd700",marginTop:"8px"}},(sp[0]?sp[0].score:0)+" PTS"));
+    wrap.appendChild(champ);
+
+    var list = h("div",{className:"scroll-area",style:{width:"100%",maxWidth:"550px"}});
+    list.appendChild(h("div",{className:"orb",style:{fontSize:"10px",letterSpacing:"3px",color:"#556",textAlign:"center",marginBottom:"14px"}},"FINAL STANDINGS"));
+    sp.forEach(function(p,i){
+      var bc = i===0?"rgba(255,215,0,0.4)":i===1?"rgba(192,192,192,0.2)":i===2?"rgba(205,127,50,0.2)":"rgba(100,120,180,0.1)";
+      var row = h("div",{className:"lb-row"+(i===0?" gold":""),style:{border:"1px solid "+bc,animation:"slideIn 0.5s "+(i*0.1)+"s both"}});
+      var medalBg = i===0?"rgba(255,215,0,0.2)":i===1?"rgba(192,192,192,0.15)":i===2?"rgba(205,127,50,0.15)":"rgba(50,60,90,0.5)";
+      var medalColor = i===0?"#ffd700":i===1?"#c0c0c0":i===2?"#cd7f32":"#556";
+      var medals = ["\u{1F947}","\u{1F948}","\u{1F949}"];
+      var medalText = i<3?medals[i]:"#"+(i+1);
+      row.appendChild(h("div",{className:"orb",style:{width:"38px",height:"38px",borderRadius:"12px",display:"flex",alignItems:"center",justifyContent:"center",background:medalBg,fontSize:i<3?"18px":"13px",fontWeight:900,color:medalColor}},medalText));
+      var info = h("div",{style:{flex:"1"}});
+      info.appendChild(h("div",{style:{fontWeight:700,fontSize:"16px",color:i===0?"#ffd700":"#e0e6f0"}},p.name));
+      var pct = Math.round((p.correct/QUESTIONS.length)*100);
+      info.appendChild(h("div",{style:{fontSize:"11px",color:"#778",marginTop:"2px"}},p.correct+"/"+QUESTIONS.length+" correct \xb7 "+p.buzzFirst+" buzz \xb7 "+pct+"% accuracy"));
+      row.appendChild(info);
+      row.appendChild(h("div",{className:"orb",style:{fontSize:"20px",fontWeight:900,color:i===0?"#ffd700":i===1?"#c0c0c0":"#00ffaa"}},""+p.score));
+      list.appendChild(row);
+    });
+    wrap.appendChild(list);
+    wrap.appendChild(h("button",{className:"orb",style:{marginTop:"28px",padding:"14px 36px",background:"linear-gradient(135deg,#00ffaa,#00ccff)",border:"none",borderRadius:"12px",color:"#0a0e17",fontWeight:900,fontSize:"14px",letterSpacing:"2px"},onClick:playAgain},"\u{1F504} PLAY AGAIN"));
+    app.appendChild(wrap);
+    return;
+  }
+}
+
+// Init
+initParticles();
+render();
+</script>
 </body>
 </html>
